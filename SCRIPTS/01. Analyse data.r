@@ -1,6 +1,6 @@
-  ################################################################################ 
-  # 00. LOAD LIBRARIES AND SET UP PATHS
-  ################################################################################ 
+#_______________________________________________________________________________
+# 00. LOAD LIBRARIES AND SET UP PATHS ----
+#_______________________________________________________________________________
   
 
   library("here")
@@ -58,26 +58,34 @@
     plotly_plot
   }
   
-  ############################################################################## 
-  # 01. IMPORT  DATASETS and clean
-  ############################################################################## 
+  #_____________________________________________________________________________
+  # 01. IMPORT  DATASETS and clean ----
+  #_____________________________________________________________________________
   
   # The data has columns grouped by sector (and overall) with four columns in each group:
   # total count, UK count, EU count and non-EU count
   # We reshape long by segment to easily calculate shares within each
   
-  #_____________________________________________________________________________
-  # 01.1. Load data and reshape
-  #_____________________________________________________________________________
+  # The 2023 data has numbers in sheet names
+  data_file_name <- "paye_employments_dec2022.xlsx"
+  
+  #.............................................................................
+  ## 01.1. Load data and reshape ----
+  #.............................................................................
   
   # Loop through each sheet
-  region_sheets <- c("England","North_East","North_West","Yorkshire_and_the_Humber","East_Midlands","West_Midlands","East","London","South_East","South_West","Scotland","Wales","Northern_Ireland")
+  region_sheets_names <- c("UK","UK_EU_nationals","England","North_East","North_West","Yorkshire_and_the_Humber","East_Midlands","West_Midlands","East","London","South_East","South_West","Scotland","Wales","Northern_Ireland")
+  region_sheets <- setNames(as.character(c(1:length(region_sheets_names))),
+                                  nm=region_sheets_names)
   
-  for (region in region_sheets) {
+  
+  for (region in names(region_sheets)) {
     dat_name <- tolower(region)
     
-    load_dta <- readxl::read_excel(path = here("INPUT","paye_employments_jul14jun21.xlsx"), sheet = region, skip=2) %>%
-      clean_names()  %>%
+    load_dta <- readxl::read_excel(path = here("INPUT",data_file_name),
+                                   sheet = region_sheets[[region]], skip=3) %>%
+      clean_names()     %>%
+      filter(date != "End of worksheet") %>% 
       rename_with(~str_replace(., "information_and_communication","in_information_and_communication")) %>% 
       rename_with(~str_replace(., "industry_administrative_and_support_services","in_administrative_and_support_services")) %>% 
       rename_with(~str_c(., "_in_overall"),ends_with("_counts")) %>% # Ensuring there is also a suffix for overall
@@ -85,6 +93,7 @@
       mutate(across(where(is.character) & !date, 
                     ~ case_when(. == "[d]" ~ as.character(NA), # Where suppressed due to disclosure, make into NA
                                 TRUE ~ .))) %>% 
+      mutate(date = gsub("\\[(\\w)\\]","\\1",date)) %>% 
       mutate(across(where(is.character) & !date, as.numeric)) #ensuring all columns are numeric before reshaping long
     
     load_dta_long<- load_dta %>% 
@@ -97,28 +106,11 @@
   
   remove(region)
   
-  regions <- tolower(region_sheets)
-  
-  # UK data
-  paye_uk_data <- readxl::read_excel(path = here("INPUT","paye_employments_jul14jun21.xlsx"), sheet = "UK_for_UK,EU_and_nonEU", skip=2) %>%
-    clean_names() %>%
-    rename_with(~str_replace(., "information_and_communication","in_information_and_communication")) %>% 
-    rename_with(~str_replace(., "industry_administrative_and_support_services","in_administrative_and_support_services")) %>% 
-    rename_with(~str_c(., "_in_overall"),ends_with("_counts")) %>% # Ensuring there is also a suffix for overall
-    rename_with(~str_replace(.,"total_",""),!contains("total_employment")) %>% 
-    mutate(across(where(is.character) & !date, 
-                  ~ case_when(. == "[d]" ~ as.character(NA),
-                              TRUE ~ .))) %>% 
-    mutate(across(where(is.character) & !date, as.numeric)) #ensuring all columns are numeric before reshaping long
-  
-  paye_uk_data_long <- paye_uk_data %>% 
-    pivot_longer(cols = -date, names_to = c(".value","section"),names_sep = "_in_")
-  
-  remove(paye_uk_data)
-  
-  #_____________________________________________________________________________
-  # 01.2. Calculate shares
-  #_____________________________________________________________________________
+  regions <- tolower(region_sheets_names[!region_sheets_names %in% c("UK","UK_EU_nationals")])
+
+  #.............................................................................
+  ## 01.2. Calculate shares ----
+  #.............................................................................
   
   data_list <- list() # For combining datasets
   i=1
@@ -143,9 +135,9 @@
     
   }
   
-  #_____________________________________________________________________________
-  # 01.3. Combine into one dataset
-  #_____________________________________________________________________________
+  #.............................................................................
+  ## 01.3. Combine into one dataset ----
+  #.............................................................................
   
   paye_master_long <- bind_rows(data_list) %>% 
     mutate(geography_name = case_when(geography == "uk" ~ "UK" ,   # Create clean name for charts
@@ -200,17 +192,17 @@
   write.xlsx(paye_master_long_detail,paste0(OUTPUT,"/DATA/","long_paye_data.xlsx"))
   
   
-  ############################################################################## 
-  # 02. Charting
-  ############################################################################## 
+  #_____________________________________________________________________________
+  # 02. Charting ----
+  #_____________________________________________________________________________ 
   
   # Store London charts in a list for easy use in markdown
   london_charts <- list()
   chart_n = 1
   
-  #_____________________________________________________________________________
-  # 02.1. One section for all regions, London and UK highlighted
-  #_____________________________________________________________________________
+  #.............................................................................
+  ## 02.1. One section for all regions, London and UK highlighted ----
+  #.............................................................................
 
   # Define some helper vectors
   sections_list <- unique(paye_master_long$section_name)
@@ -388,9 +380,9 @@
   remove(dat_section)
   remove(share_pop)
 
-  #_____________________________________________________________________________
-  # 02.2. Compare sections within regions
-  #_____________________________________________________________________________
+  #.............................................................................
+  ## 02.2. Compare sections within regions ----
+  #.............................................................................
 
   #.............................................................................
   # Horizontal bars with share of nationalities in each section
@@ -629,9 +621,9 @@
       }
   }
   
-  #_____________________________________________________________________________
-  # 02.3. Sector deep dives
-  #_____________________________________________________________________________
+  #.............................................................................
+  ## 02.3. Sector deep dives ----
+  #.............................................................................
   
   
   # Plot percentage change by sector within regions
@@ -726,9 +718,9 @@
     
   }
   
-  #_____________________________________________________________________________
-  # 02.4. Ad hoc charts
-  #_____________________________________________________________________________
+  #.............................................................................
+  ## 02.4. Ad hoc charts ----
+  #.............................................................................
   
   #.............................................................................
   # Create trend chart for London nationalities overall
