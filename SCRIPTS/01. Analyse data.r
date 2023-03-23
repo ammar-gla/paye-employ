@@ -24,10 +24,7 @@
 
   #.............................................................................
   
-  ### Paths
-  INPUT <- paste0(here("INPUT"),"/")
-  INTERMEDIATE <- paste0(here("INTERMEDIATE"),"/")
-  OUTPUT <- paste0(here("OUTPUT"),"/")
+
   
   #.............................................................................
   
@@ -199,6 +196,9 @@
   # Store London charts in a list for easy use in markdown
   london_charts <- list()
   chart_n = 1
+  
+  # Max date
+  last_date_month <- format(max(paye_master_long$date_day),"%B %Y")
   
   #.............................................................................
   ## 02.1. One section for all regions, London and UK highlighted ----
@@ -511,7 +511,7 @@
       filter(geography_name == dat_region & section_name %in% top_sections & measure_name == "counts" & date_day>="2020-01-01" ) %>% 
       ggplot(mapping = aes(text = paste(
                              nationality_name, "\n",
-                             date_day, "\n",
+                             format(date_day,"%b-%y"), "\n",
                              "Index: ", value_form(index_feb20,s=4,d=1),"\n",
                              sep = ""))) +
       ggla_line(aes(x = date_day,
@@ -527,10 +527,10 @@
                  size = 1 * mm_to_pt,
                  colour = rgb(166,166,166,maxColorValue = 255)) + # mark lockdowns start
       coord_cartesian(clip = 'off') +
-      scale_y_continuous(limits = c(60, 120),labels = dollar_format(prefix = "", 
+      scale_y_continuous(limits = c(60, 140),labels = dollar_format(prefix = "", 
                                                                   largest_with_cents = 1,
                                                                   suffix = "")) +
-      scale_x_date(date_labels = "%b'%y",date_breaks = "6 months" ) +
+      scale_x_date(date_labels = "%b'%y",date_breaks = "9 months" ) +
       theme(plot.margin = unit(c(1,1,1,1), "cm"),
             panel.spacing = unit(1,"lines")) %>% 
       labs(title = paste0("Employment by nationality within ", dat_region),
@@ -686,7 +686,7 @@
        guides(colour=guide_legend(reverse=TRUE),
               fill=guide_legend(reverse=TRUE)) +
       labs(title = paste0("Payrolled employments percentage change by industry in ",dat_region),
-           subtitle = paste0("Change by nationality Feb 2020-June 2021"),
+           subtitle = paste0("Change by nationality Feb 2020-",last_date_month),
            caption = "\nSource: HMRC PAYE RTI.")+
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     section_change_bar
@@ -699,7 +699,7 @@
         layout(title = list(text = paste0("<b>","Payrolled employments percentage change by industry in ",dat_region,"</b>",
                                           "<br>",
                                           "<sup>",
-                                          paste0("Change by nationality Feb 2020-June 2021, top ", n_top-1, " industries"),
+                                          paste0("Change by nationality Feb 2020-",last_date_month," top ", n_top-1, " industries"),
                                           "</sup>",
                                           "<br>"),
                             font = list(size = 22),
@@ -738,7 +738,7 @@
       sufx <-  "%"
       desc <- "Share: "
       subtitle <- "Nationality as share of total payrolled employments"
-      yscale <- c(15,21)
+      yscale <- c(15,24)
       f_x <- function(x) {
         perc_form(x)
       }  
@@ -747,7 +747,7 @@
       sufx <-  ""
       desc <- "Count: "
       subtitle <- "Count of total payrolled employments"
-      yscale <- c(600000,900000)
+      yscale <- c(600000,1.1e6)
       f_x <- function(x) {
         value_form(x,s=3)
       }
@@ -773,7 +773,7 @@
       scale_y_continuous(limit=yscale,labels = dollar_format(prefix = "", 
                                                              largest_with_cents = 1,
                                                              suffix = sufx)) +
-      scale_x_date(date_labels = "%b %y",date_breaks = "9 months") +
+      scale_x_date(date_labels = "%b %y",date_breaks = "1 year") +
       theme(plot.margin = unit(c(1,1,1,1), "cm"))+
       labs(title = paste0("Employment by nationality within London"),
            subtitle = subtitle,

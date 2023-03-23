@@ -1,49 +1,116 @@
 /* ---------- TABLE OF CONTENTS ------ */
 
 /* Color of active item */
-
-.list-group-item.active, 
-.list-group-item.active:hover {
+.tocify-item.active {
     background-color: #353d42;
     border-color: #353d42;
+}
+
+.tocify-item.active:hover {
+    background-color: #9e0062;
+    border-color: #9e0062;
+}
+
+/* Color of non-active text when hovering */
+.tocify-item:hover {
+    color: #9e0062;
+}
+
+/* Thin side border on TOC list */
+.tocify ul {
+  border-right: 1px solid #ccc; 
+  border-left: 1px solid #ccc; 
 }
 
 
 /* ------------- MISC ----------------*/
 
-/* Color of links for tabs */
+/* Color of links for tabs - grey when inactive, LDNpurple if active/hover */
 
-ul.nav nav-tabs a {
+.nav a {
     color: #353d42;
 }
 
-/* Info box */
-
-
-div.infobox { 
-background-color:#c2c4c6; 
-border-radius: 5px; 
-padding: 20px;
- <span style="padding-right:3px; padding-top: 3px; display:block;">
-    <img class="manImg" src="images/ico_mandatory.gif"></img>
-  </span>
+.nav-tabs >li.active > a,
+.nav-tabs >li.active > a:hover,
+.nav-tabs >li.active > a:focus,
+ .nav a:hover,
+ .nav a:active  {
+    color: #9e0062;
 }
 
-img {
-  display: inline-block;
+.nav-tabs >li.active > a,
+.nav-tabs >li.active > a:hover,
+.nav-tabs >li.active > a:focus,
+a:hover,
+a:active  {
+    color: #9e0062;
 }
 
-div.info_outer {
-  padding: 10px;
-  display: flex;
+/* Data box*/
+.databox {
+  padding: 1em 1em 1em 1em;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  background: #b4d6f2;
 }
 
-div.info_inner {
-  display: inline-block;
-  width: 100%;
-  background-color: #c2c4c6;
-  padding: 5px;
+/* Info box*/
+.infobox {
+  padding: 1em 1em 1em 5em;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  background: #f5f5f5 5px center/2.5em no-repeat;
 }
+
+.infobox p {
+  margin-bottom:0;
+  font-weight: bold;
+  font-size: 13pt;
+}
+
+.info_symbol {
+  background-image: url("ICONS/more-info.svg");
+}
+
+.caution_symbol {
+  background-image: url("ICONS/circle-exclamation-solid.svg");
+}
+
+/* Quote box*/
+.quotebox {
+  padding: 1em 1em 1em 5em;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  background: 5px center/3.5em no-repeat;
+}
+
+.quotebox p {
+  margin-bottom:0;
+  font-style: italic;
+}
+
+.quote_symbol {
+  background-image: url("ICONS/double-quote-symbol.svg");
+}
+
+/* Input picker for highlight plotly */
+
+.colourpicker,
+.colourpicker.palette-limited.colourpicker-focus
+.colourpicker-input {
+	color: rgb(0,0,0,0) !important;
+}
+
+.colourpicker.element.style {
+	color: rgb(0,0,0,0) !important;
+}
+
+/* Make leaflet map backgrounds white */
+.leaflet-container {
+    background: #FFF;
+}
+
 
 /* --------- Whole document: ------------ */
 .main-container {
@@ -57,6 +124,17 @@ body{
   font-size: 14pt;
   color: rgb(53,61,66);
   line-height: 1.5em;
+}
+
+/* Color the background of selected text */
+::-moz-selection { /* Code for Firefox */
+  color: white;
+  background: #9e0062;
+}
+
+::selection {
+  color: white;
+  background: #9e0062;
 }
 
 foot{
@@ -78,31 +156,33 @@ h1,h2,h3,h4,h5,h6{
   font-size: 20pt;
   font-family: Arial;
   color: rgb(53,61,66);
-
-h1, h2, h3 {
-    margin-top: 84px;
-    margin-bottom: 160px;
 }
+
 
 /* The title and information */
 h1.title {
-  font-size: 20pt;
+  font-size: 28pt;
   font-family: Arial;
   color: rgb(53,61,66);
 }
 
-.author, .date {
+h4.date {
   font-family: 'Arial';
-  font-size: 14pt;
+  font-size: 18pt;
+  color: rgb(53,61,66);
+}
+
+h4.author {
+  font-family: 'Arial';
+  font-size: 12pt;
   color: rgb(137,137,137);
 }
+
 
 /* Hyperlinks */
 a {
   color: #337ab7;
 }
-
-
 
 .header {
   padding: 60px;
