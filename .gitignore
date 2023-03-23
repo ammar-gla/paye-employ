@@ -6,10 +6,10 @@ _old/
 /OUTPUT/PLOTS/*
 
 !/OUTPUT/**/*.gitkeep
-!/OUTPUT/across_sections/*.gitkeep
-!/OUTPUT/ad_hoc/*.gitkeep
-!/OUTPUT/by_section/*.gitkeep
-!/OUTPUT/within_region/*.gitkeep
+!/OUTPUT/PLOTS/across_sections/*.gitkeep
+!/OUTPUT/PLOTS/ad_hoc/*.gitkeep
+!/OUTPUT/PLOTS/by_section/*.gitkeep
+!/OUTPUT/PLOTS/within_region/*.gitkeep
 
 # Ignore R project user info and any potential history files
 .Rproj.user
