@@ -2,14 +2,11 @@
 _old/
 
 # Ignore the files in output folders, but keep folders
-/OUTPUT/DATA/*
-/OUTPUT/PLOTS/**/*
+/OUTPUT/**
 
+!/OUTPUT/**/
 !/OUTPUT/**/.gitkeep
-!/OUTPUT/PLOTS/across_sections/.gitkeep
-!/OUTPUT/PLOTS/ad_hoc/.gitkeep
-!/OUTPUT/PLOTS/by_section/.gitkeep
-!/OUTPUT/PLOTS/within_region/.gitkeep
+
 
 # Ignore R project user info and any potential history files
 .Rproj.user
