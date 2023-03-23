@@ -1,0 +1,113 @@
+/* ---------- TABLE OF CONTENTS ------ */
+
+/* Color of active item */
+
+.list-group-item.active, 
+.list-group-item.active:hover {
+    background-color: #353d42;
+    border-color: #353d42;
+}
+
+
+/* ------------- MISC ----------------*/
+
+/* Color of links for tabs */
+
+ul.nav nav-tabs a {
+    color: #353d42;
+}
+
+/* Info box */
+
+
+div.infobox { 
+background-color:#c2c4c6; 
+border-radius: 5px; 
+padding: 20px;
+ <span style="padding-right:3px; padding-top: 3px; display:block;">
+    <img class="manImg" src="images/ico_mandatory.gif"></img>
+  </span>
+}
+
+img {
+  display: inline-block;
+}
+
+div.info_outer {
+  padding: 10px;
+  display: flex;
+}
+
+div.info_inner {
+  display: inline-block;
+  width: 100%;
+  background-color: #c2c4c6;
+  padding: 5px;
+}
+
+/* --------- Whole document: ------------ */
+.main-container {
+  max-width: 1300px !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body{
+  font-family: 'Arial';
+  font-size: 14pt;
+  color: rgb(53,61,66);
+  line-height: 1.5em;
+}
+
+foot{
+  font-family: 'Arial';
+  font-size: 12pt;
+  color: rgb(166,166,166);
+  line-height: 1em;
+}
+
+
+p.caption{
+    font-size: 12pt;
+    color: rgb(166,166,166);
+    line-height: 1em;
+}
+
+/* Headers */
+h1,h2,h3,h4,h5,h6{
+  font-size: 20pt;
+  font-family: Arial;
+  color: rgb(53,61,66);
+
+h1, h2, h3 {
+    margin-top: 84px;
+    margin-bottom: 160px;
+}
+
+/* The title and information */
+h1.title {
+  font-size: 20pt;
+  font-family: Arial;
+  color: rgb(53,61,66);
+}
+
+.author, .date {
+  font-family: 'Arial';
+  font-size: 14pt;
+  color: rgb(137,137,137);
+}
+
+/* Hyperlinks */
+a {
+  color: #337ab7;
+}
+
+
+
+.header {
+  padding: 60px;
+  text-align: center;
+  background: #353D42
+  color: white;
+  font-size: 30px;
+}

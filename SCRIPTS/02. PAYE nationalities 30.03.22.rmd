@@ -1,0 +1,317 @@
+---
+title:  "<br> PAYE Employments by nationality"
+date: "`r format(Sys.Date(),'%B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    css:  !expr "here::here('FORMATTING','GLAstyle.css')"
+    includes:
+      in_header: !expr "here::here('FORMATTING','favicon.html')"
+      before_body: !expr "here::here('FORMATTING','header.html')"
+      after_body: !expr "here::here('FORMATTING','footer.html')"
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_file = "PAYE Employments by nationality",
+      envir = globalenv()
+    )
+  })
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+knitr::opts_chunk$set(echo = TRUE,scipen=999)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+
+```
+
+```{r all data, include = FALSE}
+
+  ################################################################################ 
+  # 00. LOAD LIBRARIES AND SET UP PATHS
+  ################################################################################ 
+  
+
+  library("here")
+  library("tidyverse")
+  library("ggplot2")
+  library("ggthemes")
+  library("nomisr")
+  library("devtools")
+  library("remotes")
+  library("scales")
+  library("gglaplot")
+  library("data.table")
+  library("janitor")
+  library("lubridate")
+  library("readr")
+  library("ggrepel")
+  library("plotly")
+  library("magrittr")
+  library("zoo")
+  library("openxlsx")
+  library("fontawesome")
+
+  #.............................................................................
+  
+  ### Paths
+  INPUT <- paste0(here("INPUT"),"/")
+  INTERMEDIATE <- paste0(here("INTERMEDIATE"),"/")
+  OUTPUT <- paste0(here("OUTPUT"),"/")
+  
+  #.............................................................................
+  
+  ### FUNCTIONS
+  ### For ease of referencing figures in the text
+  
+  pull_data <- function(var=NULL,dt_day=NULL,geo="london",sec="Overall") {
+    if (typ=="v") { #if a value
+      f_x <- function(x) value_form(x,s=3)
+    }
+    else if (typ=="%") { #if a percentage
+      f_x <- function(x) perc_form(x)
+    }
+    
+    if (is.null(dt_day)) {
+      data_point <- paye_master_long %>% 
+      filter(geography == geo & section_name == sec & date_day == max(date_day)) %>% 
+      pull(var)
+    }    else {
+      data_point <- paye_master_long %>% 
+      filter(geography == geo & section_name == sec & date_day == ymd(dt_day)) %>% 
+      pull(var)
+    }
+    
+    return(abs2(f_x(data_point))) # Format the value and remove negative signs
+  }
+  
+  # Slightly different function for the longer version of the data, which is more flexible
+  pull_data_det <- function(var="measure_value", #variable name
+                            dt_day=NULL, #date, if not take latest
+                            nat=NULL, #nationality
+                            meas=NULL, #if share or count
+                            geo="london", #geography
+                            sec="Overall", #industry sector
+                            typ="v",  #whether value or percentage format
+                            abs=TRUE, #whether signs should be removed
+                            decimals=NULL) { #specify number of decimal points
+    if (typ=="v") { #if a value
+      if (is.null(decimals))  f_x <- function(x) value_form(x,s=3)
+      else   f_x <- function(x) value_form(x,s=3,d=decimals)
+    }
+    else if (typ=="%") { #if a percentage
+      if (is.null(decimals)) f_x <- function(x) perc_form(x)
+      else f_x <- function(x) perc_form(x,d=decimals)
+    }
+    
+    if (is.null(dt_day)) {
+      data_point <- paye_master_long_detail %>% 
+      filter(geography == geo & section_name == sec & date_day == max(date_day) & nationality == nat & measure_name == meas) %>% 
+      pull(var)
+    }    else {
+      data_point <- paye_master_long_detail %>% 
+      filter(geography == geo & section_name == sec & nationality == nat & measure_name == meas & date_day == ymd(dt_day)) %>% 
+      pull(var)
+    }
+
+    if (abs==TRUE)  return(abs2(f_x(data_point))) # Format the value and remove negative signs
+    else if (abs==FALSE)  return(f_x(data_point)) # do not remove negative sign
+  }
+
+  ################################################################################ 
+  # 01. RUN DATA SCRIPT
+  ################################################################################   
+
+source(here::here("SCRIPTS","01. Analyse data.r"))
+  
+```
+<br/>
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## Summary of key points
+<br/>
+
+- The introduction of lockdown measures in March 2020 coincided with decreases in the number of payrolled employments in London, particularly for employments held by EU nationals.
+
+-  By June 2021, there were `r pull_data_det(dt_day="2021-06-01",nat="eu",meas="counts")` payrolled employments held by EU nationals living in the capital and `r pull_data_det(dt_day="2021-06-01",nat="non_eu",meas="counts")` held by non-EU (and non-UK) nationals.
+
+-  This accounted for around `r pull_data_det(nat="eu",meas="share",typ="%",geo="london",decimals=0)`% and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="london",decimals=0)`% of total employments in London - for both EU and non-EU workers, these shares were far higher than for other UK regions.
+
+<br/>
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## Introduction
+<br/>
+
+HM Revenue and Customs (HMRC) has published new statistics on [payrolled employments in the UK by region, industry and nationality, from July 2014 to June 2021](https://www.gov.uk/government/statistics/payrolled-employments-in-the-uk-by-region-industry-and-nationality-from-july-2014-to-june-2021). This article explores some of the key trends for London.
+
+Please note, the payrolled employment counts used in this article cannot be:
+
+-  directly compared with payrolled employee numbers - payrolled employees can have multiple payrolled employments, so employment counts follow the same trend as employee counts, but will be higher.
+
+-  directly compared with total jobs numbers - these statistics only include employments from the PAYE system, they do not include employments from non-payrolled sources such as self-employment. 
+
+-  used as a count of monthly or annual migration to the UK or London, or to show the number of non-UK nationals who are currently living in the UK or London.
+
+Nationality breakdowns are determined using HMRC’s Migrant Worker Scan (MWS). Nationality is reported by individuals when they register for a National Insurance number and may change following registration. 
+
+The data covers the period from June 2014 to June 2021 and has not been seasonally adjusted. For more information, see the [HMRC release](https://www.gov.uk/government/statistics/payrolled-employments-in-the-uk-by-region-industry-and-nationality-from-july-2014-to-june-2021).
+
+<br/>
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+
+
+
+## Overview in London {.tabset}
+<br/>
+
+The number of payrolled employments held by non-UK nationals living in London was generally increasing between 2014 and 2020, even following the EU exit vote. However, the introduction of coronavirus (COVID-19) lockdown measures coincided with a decline in payrolled employments for all nationality groups.
+
+- The number of employments held by EU workers increased from `r pull_data_det(dt_day="2014-07-01",nat="eu",meas="counts")` in July 2014 to `r pull_data_det(dt_day="2020-02-01",nat="eu",meas="counts")` in February 2020, before falling to `r pull_data_det(dt_day="2021-06-01",nat="eu",meas="counts")` in June 2021.
+- The number of employments held by non-EU workers* over the same period was `r pull_data_det(dt_day="2014-07-01",nat="non_eu",meas="counts")` (July 2014), `r pull_data_det(dt_day="2020-02-01",nat="non_eu",meas="counts")` (February 2020), and `r pull_data_det(dt_day="2021-06-01",nat="non_eu",meas="counts")` (June 2021). 
+
+The introduction of lockdown measures in March 2020 had a particular impact on the count of payrolled employments held by EU nationals living in the capital. Between February 2020 and February 2021:
+
+- The overall count of payrolled employments held by employees living in London (including UK nationals) decreased by `r pull_data_det(var="p_change_feb20",dt_day="2021-02-01",nat="overall",meas="counts",typ="%")`%.
+- The number of employments held by EU and non-EU workers decreased by `r pull_data_det(var="p_change_feb20",dt_day="2021-02-01",nat="eu",meas="counts",typ="%")`% and `r pull_data_det(var="p_change_feb20",dt_day="2021-02-01",nat="non_eu",meas="counts",typ="%")`%, respectively.
+
+<foot>*Note: The count of non-EU employments include those held by workers from countries part of the EEA but not the EU. </foot>
+
+### Total employment counts
+
+```{r london overview count, echo= FALSE, fig.cap = figcap, out.width='100%'}
+
+london_charts[["london_trend_counts"]]
+
+# All charts will have the same caption, so do not copy elsewhere. If modification needed, rename appropriately.
+figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical line indicates beginning of lockdowns in March 2020.")
+
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+### Nationality shares
+
+```{r london overview share, echo= FALSE, fig.cap = figcap, out.width='100%'}
+
+london_charts[["london_trend_share"]]
+
+
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+
+## Regional comparisons {.tabset}
+<br/>
+
+Notwithsanding the impacts of the pandemic, London still has a relatively large population of non-UK workers compared to other UK regions and countries. 
+
+By June 2021, `r pull_data_det(nat="eu",meas="share",typ="%",geo="london")`% of payrolled employments in London were held by EU nationals and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="london")`% were held by non-EU nationals. In both cases, this was higher than the UK average (`r pull_data_det(nat="eu",meas="share",typ="%",geo="uk")`% and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="uk")`%, respectively).
+
+These differences are even more pronounced within certain industries, including for Hospitality and Construction. In June 2021:
+
+- The share of payrolled employments held by non-UK workers in Hospitality was `r 100-as.numeric(pull_data_det(nat="uk",meas="share",typ="%",abs=FALSE,sec="Hospitality"))`% in London, more than double the UK share of `r 100-as.numeric(pull_data_det(geo="uk",nat="uk",meas="share",typ="%",abs=FALSE,sec="Hospitality"))`%.
+- The share of payrolled employments held by non-UK workers in Construction was `r 100-as.numeric(pull_data_det(nat="uk",meas="share",typ="%",abs=FALSE,sec="Construction"))`% in London, four times the UK average of `r 100-as.numeric(pull_data_det(geo="uk",nat="uk",meas="share",typ="%",abs=FALSE,sec="Construction"))`%.
+
+### Regional comparison, overall
+
+```{r region share chart, echo= FALSE, fig.cap = figcap2, out.width='100%'}
+
+london_charts[["emp_shares_Overall"]]
+
+figcap2 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live.")
+
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+
+### Regional comparison, Hospitality
+
+```{r region hosp share chart, echo= FALSE, fig.cap = figcap2, out.width='100%'}
+
+london_charts[["emp_shares_Hospitality"]]
+
+```
+
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+### Regional comparison, Construction
+
+```{r region cons share chart, echo= FALSE, fig.cap = figcap2, out.width='100%'}
+
+london_charts[["emp_shares_Construction"]]
+
+```
+
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## Recent trends across industries {.tabset}
+<br/>
+
+There is variation in how payrolled employment counts have evolved across industries since the start of the coronavirus pandemic. 
+
+The charts below show trends for a selection of industries from February 2020 to June 2021. By June 2021, the number of payrolled employments in London had increased in some industries (e.g. Construction, Health) but remained well below pre-pandemic levels in others (e.g. Hospitality).
+
+Focusing on trends by nationality, the number of payrolled employments held by EU nationals generally recovered less well over this period. There was a particularly sharp drop in EU nationals in London working in the Hospitality sector.
+
+
+### Selected industries in London
+```{r london facets, echo=FALSE, fig.cap = figcap, out.width='100%'}
+
+london_charts[["fac_London"]]
+
+```
+
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+### Selected industries in the UK
+```{r uk facets, echo=FALSE, fig.cap = figcap, out.width='100%'}
+
+london_charts[["fac_UK"]]
+
+```
+
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## Recent trends by nationality in London 
+
+<br/>
+
+Looking at the percentage change in payrolled employments from February 2020 to June 2021 across the ten largest industries in London, these sectoral differences become even clearer.
+
+* Construction saw the largest rate of growth in payrolled employments at `r pull_data_det(var="p_change_feb20",nat="overall",meas="counts",typ="%",abs=TRUE,sec="Construction")`%. Over this time, the number of employment held by EU and non-EU nationals increased by `r pull_data_det(var="p_change_feb20",nat="eu",meas="counts",typ="%",abs=TRUE,sec="Construction")`% and `r pull_data_det(var="p_change_feb20",nat="non_eu",meas="counts",typ="%",abs=TRUE,sec="Construction")`%, respectively.
+* Hospitality recorded the largest decrease in payrolled employments at `r pull_data_det(var="p_change_feb20",nat="overall",meas="counts",typ="%",abs=TRUE,sec="Hospitality")`%. This was driven by a particularly sharp drop in the number of employments held by EU nationals, which fell by `r pull_data_det(var="p_change_feb20",nat="eu",meas="counts",typ="%",abs=TRUE,sec="Hospitality")`%.
+
+<br/>
+
+| `r fa(name = "fas fa-info-circle", height = "1em")`<strong>  Note: payrolled employment counts cannot be compared with counts of total jobs. 
+|      For the latest data on total jobs counts, see our [Labour Market Update](https://data.london.gov.uk/download/gla-economics-covid-19-labour-market-analysis/6ee07998-076c-49ff-bf8d-9f16935e31b6/LMU%20March%202022.html) release.</strong>
+
+<br/>
+
+```{r london bar change, echo=FALSE, fig.cap = figcap3, out.width='100%'}
+
+london_charts[["p_change_London"]]
+
+figcap3 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live.")
+
+```
+
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+<br/>
+
+
+::: {.tocify-extend-page data-unique="tocify-extend-page" style="height: 0;"}
+:::

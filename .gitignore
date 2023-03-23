@@ -1,0 +1,16 @@
+# Ignore all archive folders
+_old/
+
+# Ignore the files in output folders, but keep folders
+/OUTPUT/DATA/*
+/OUTPUT/PLOTS/*
+
+!/OUTPUT/**/*.gitkeep
+
+# Ignore R project user info and any potential history files
+.Rproj.user
+.Rhistory
+.Rapp.history
+
+# Ignore thumbs file
+Thumbs.db
