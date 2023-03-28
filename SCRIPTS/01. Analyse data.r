@@ -1,60 +1,4 @@
-#_______________________________________________________________________________
-# 00. LOAD LIBRARIES AND SET UP PATHS ----
-#_______________________________________________________________________________
-  
 
-  library("here")
-  library("tidyverse")
-  library("ggplot2")
-  library("ggthemes")
-  library("nomisr")
-  library("devtools")
-  library("remotes")
-  library("scales")
-  library("gglaplot")
-  library("data.table")
-  library("janitor")
-  library("lubridate")
-  library("readr")
-  library("ggrepel")
-  library("plotly")
-  library("magrittr")
-  library("zoo")
-  library("openxlsx")
-
-  #.............................................................................
-  
-
-  
-  #.............................................................................
-  
-  ### Functions
-  ### Define function to always present percentages with one decimal and figures without decimals
-  perc_form = function(x, d=1) sprintf(paste0("%1.",d,"f"), x) 
-  
-  value_form = function(x,s=2,d= -1) format(signif(round(as.numeric(x), d),s), big.mark=",")
-
-  ### Function to remove negative sign from character strings (needed as formatted numbers are not numerical)
-  abs2 <- function(x) {
-    y = gsub("-","",x)
-    return(y)
-  }
-  
-  ### Helper function to ensure legend labels are placed correctly
-  reverse_legend_labels <- function(plotly_plot) {
-    n_labels <- length(plotly_plot$x$data)
-    plotly_plot$x$data[1:n_labels] <- plotly_plot$x$data[n_labels:1]
-    plotly_plot
-  }
-  
-  ### Helper function to re-introduce simplified modebar allowing chart download
-  plotly_modebar <- function(plotly_plot) {
-    plotly_plot <- plotly_plot %>% plotly::config(displayModeBar = TRUE) %>% # Allows menu bar such that image can be downloaded
-      plotly::config(modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","zoom2d","pan2d","autoScale2d","hoverClosestCartesian","hoverCompareCartesian","select2d","lasso2d")) %>% 
-      plotly::config(displaylogo = FALSE)
-    plotly_plot
-  }
-  
   #_____________________________________________________________________________
   # 01. IMPORT  DATASETS and clean ----
   #_____________________________________________________________________________
@@ -186,7 +130,7 @@
     relocate(geography,geography_name,section,section_name,nationality,nationality_name,date,date_day,measure_name,measure_value)
   
   # Export to Excel
-  write.xlsx(paye_master_long_detail,paste0(OUTPUT,"/DATA/","long_paye_data.xlsx"))
+  write.xlsx(paye_master_long_detail,paste0(OTHERDATA,"long_paye_data.xlsx"))
   
   
   #_____________________________________________________________________________
@@ -262,7 +206,7 @@
              caption = "PAYE RTI data") +
         theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
       
-      ggsave(here::here("OUTPUT","PLOTS","by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+      ggsave(here::here(IMAGES,"by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
       
       # Save useful charts in the list
       if (dat_section %in% c("Hospitality","Overall")) {
@@ -348,7 +292,7 @@
            caption = "PAYE RTI data") +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
-    ggsave(here::here("OUTPUT","PLOTS","by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
     
     if (dat_section %in% c("Hospitality","Overall","Construction")) {
       plotly <- ggplotly(regioncomp_shares,tooltip = "text") %>% 
@@ -447,7 +391,7 @@
            caption = "PAYE RTI data") +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
-    ggsave(here::here("OUTPUT","PLOTS","within_region",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"within_region",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
     
     if (dat_region=="London") {
       plotly <- ggplotly(region_topsec,tooltip = "text") %>% 
@@ -538,7 +482,7 @@
            caption = "PAYE RTI data") +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
-    ggsave(here::here("OUTPUT","PLOTS","within_region",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"within_region",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
     
     if (dat_region %in% c("London","UK")) {
       
@@ -691,7 +635,7 @@
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     section_change_bar
     
-    ggsave(here::here("OUTPUT","PLOTS","across_sections",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"across_sections",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
     
     if (dat_region=="London") {
       plotly <- ggplotly(section_change_bar,tooltip = "text") %>% 
@@ -780,7 +724,7 @@
            caption = "PAYE RTI data, non-seasonally adjusted.") +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
-    ggsave(here::here("OUTPUT","PLOTS","ad_hoc",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"ad_hoc",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
     
     # Plotly
     plotly <- ggplotly(trend_chart,tooltip = "text") %>% 
