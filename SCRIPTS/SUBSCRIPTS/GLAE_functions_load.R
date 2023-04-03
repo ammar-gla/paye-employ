@@ -331,23 +331,23 @@ nat_table_func <- function(dataset_name=NULL) {
               "section_name" = colDef(name = "Industry",width = 200,filterable = FALSE,align = "left"),
               "measure_value_uk"= colDef(name = "Employments Dec '22 (#)",
                                          width = 115),
-              "p_change_nov19_uk"= colDef(name = "Change since Nov '19",
+              "p_change_dec19_uk"= colDef(name = "Change since Dec '19",
                                           width = 105),
               "measure_value_eu"= colDef(name = "Employments Dec '22 (#)",
                                          width = 115),
-              "p_change_nov19_eu"= colDef(name = "Change since Nov '19",
+              "p_change_dec19_eu"= colDef(name = "Change since Dec '19",
                                           width = 105),
               "measure_value_non_eu"= colDef(name = "Employments Dec '22 (#)",
                                              width = 115),
-              "p_change_nov19_non_eu"= colDef(name = "Change since Nov '19",
+              "p_change_dec19_non_eu"= colDef(name = "Change since Dec '19",
                                               width = 105)),
             columnGroups = list( #Providers column group names
               colGroup(name = "UK nationals",
-                       columns=c("measure_value_uk","p_change_nov19_uk")),
+                       columns=c("measure_value_uk","p_change_dec19_uk")),
               colGroup(name = "EU nationals",
-                       columns=c("measure_value_eu","p_change_nov19_eu")),
+                       columns=c("measure_value_eu","p_change_dec19_eu")),
               colGroup(name = "Non-EU nationals",
-                       columns=c("measure_value_non_eu","p_change_nov19_non_eu")))
+                       columns=c("measure_value_non_eu","p_change_dec19_non_eu")))
   )
 }
 

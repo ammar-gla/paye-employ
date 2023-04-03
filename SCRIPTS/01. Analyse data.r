@@ -483,7 +483,7 @@
                  size = 1 * mm_to_pt,
                  colour = rgb(166,166,166,maxColorValue = 255)) + # mark lockdowns start
       coord_cartesian(clip = 'off') +
-      scale_y_continuous(limits = c(60, 140),labels = dollar_format(prefix = "", 
+      scale_y_continuous(limits = c(62, 149),labels = dollar_format(prefix = "", 
                                                                   largest_with_cents = 1,
                                                                   suffix = "")) +
       scale_x_date(date_labels = "%b'%y",date_breaks = "9 months" ) +
@@ -789,8 +789,8 @@
   ## Count in London and change since November 2019 where EU=Non-EU counts
   nat_table_data <- paye_master_long_detail %>% 
     filter(date_day==max(date_day) & geography_name=="London" & measure_name=="counts" & nationality %in% c("uk","eu","non_eu")) %>% 
-    select(section_name,nationality,measure_value,p_change_nov19) %>% 
-    pivot_wider(names_from = nationality,values_from = c(measure_value,p_change_nov19)) %>%
+    select(section_name,nationality,measure_value,p_change_dec19) %>% 
+    pivot_wider(names_from = nationality,values_from = c(measure_value,p_change_dec19)) %>%
     mutate(across(contains("measure_value"), ~value_form(.,s=5)),
            across(contains("p_change"),~paste0(perc_form(.),"%"))) %>% 
     rbind(NA) %>% #add empty row

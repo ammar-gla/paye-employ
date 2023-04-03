@@ -24,13 +24,18 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
-## London overview
+## Summary & comment
 <br/>
 
 
 This release is an update of our [previous analysis on the period July 2014-June 2021](https://data.london.gov.uk/download/gla-economics-covid-19-labour-market-analysis/df64d525-e65c-4dd6-a6e5-270919aeab7e/PAYE%20Employments%20by%20nationality.html), now including the period to December 2022.
 
-- Following the post-lockdown decrease in payrolled employments, the number of employments held by non-EU (and non-UK) workers rose steadily from January 2021 onwards while the number of EU employments stabilised. This period coincided with the end of free migration for EU citizens.
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## London overview {.tabset}
+<br/>
+
+Following the post-lockdown decrease in payrolled employments, the number of employments held by non-EU (and non-UK) workers rose steadily from January 2021 onwards while the number of EU employments stabilised. This period coincided with the end of free migration for EU citizens.
 
 -  In November 2019, there were `r pull_data_det(dt_day="2019-11-01",nat="eu",meas="counts")` payrolled employments held by both EU and non-EU nationals living in London, each accounting for `r pull_data_det(dt_day="2019-11-01",nat="eu",meas="share",typ="%",geo="london",decimals=0)`% of all employments.
 
@@ -186,7 +191,7 @@ table_list$employments_table
 
 
 
-tabcap1 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Comparison is to November 2019 when the number of employments with EU and non-EU nationals were the same.")
+tabcap1 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Comparison is to December 2019 when the number of employments with EU and non-EU nationals were roughly equal")
                   
 ```
 
