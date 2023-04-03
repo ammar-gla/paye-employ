@@ -28,42 +28,25 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ## Summary of key points
 <br/>
 
-- The introduction of lockdown measures in March 2020 coincided with decreases in the number of payrolled employments in London, particularly for employments held by EU nationals.
 
--  By June 2021, there were `r pull_data_det(dt_day="2021-06-01",nat="eu",meas="counts")` payrolled employments held by EU nationals living in the capital and `r pull_data_det(dt_day="2021-06-01",nat="non_eu",meas="counts")` held by non-EU (and non-UK) nationals.
+- This release is an update of our [previous analysis on the period July 2014-June 2021](https://data.london.gov.uk/download/gla-economics-covid-19-labour-market-analysis/df64d525-e65c-4dd6-a6e5-270919aeab7e/PAYE%20Employments%20by%20nationality.html), now including the period to December 2022.
 
--  This accounted for around `r pull_data_det(nat="eu",meas="share",typ="%",geo="london",decimals=0)`% and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="london",decimals=0)`% of total employments in London - for both EU and non-EU workers, these shares were far higher than for other UK regions.
+- Following the post-lockdown decrease in payrolled employments, the number of employments held by non-EU (and non-UK) workers rose steadily from January 2021 onwards while the number of EU employments stabilised. This period coincided with the end of free migration for EU citizens.
 
-<br/>
-<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+-  In November 2019, there were `r pull_data_det(dt_day="2019-11-01",nat="eu",meas="counts")` payrolled employments held by both EU and non-EU nationals living in London, each accounting for `r pull_data_det(dt_day="2019-11-01",nat="eu",meas="share",typ="%",geo="london",decimals=0)`% of all employments.
 
-## Introduction
-<br/>
-
-HM Revenue and Customs (HMRC) has published new statistics on [payrolled employments in the UK by region, industry and nationality, from July 2014 to June 2021](https://www.gov.uk/government/statistics/payrolled-employments-in-the-uk-by-region-industry-and-nationality-from-july-2014-to-june-2021). This article explores some of the key trends for London.
-
-Please note, the payrolled employment counts used in this article cannot be:
-
--  directly compared with payrolled employee numbers - payrolled employees can have multiple payrolled employments, so employment counts follow the same trend as employee counts, but will be higher.
-
--  directly compared with total jobs numbers - these statistics only include employments from the PAYE system, they do not include employments from non-payrolled sources such as self-employment. 
-
--  used as a count of monthly or annual migration to the UK or London, or to show the number of non-UK nationals who are currently living in the UK or London.
-
-Nationality breakdowns are determined using HMRC’s Migrant Worker Scan (MWS). Nationality is reported by individuals when they register for a National Insurance number and may change following registration. 
-
-The data covers the period from June 2014 to June 2021 and has not been seasonally adjusted. For more information, see the [HMRC release](https://www.gov.uk/government/statistics/payrolled-employments-in-the-uk-by-region-industry-and-nationality-from-july-2014-to-june-2021).
+-  By December 2022, EU nationals accounted for around `r pull_data_det(dt_day="2022-11-01",nat="eu",meas="counts")` employments (`r pull_data_det(dt_day="2022-11-01", nat="eu",meas="share",typ="%",geo="london",decimals=0)`%) while non-EU nationals accounted for `r pull_data_det(dt_day="2022-11-01",nat="non_eu",meas="counts")` employments (`r pull_data_det(dt_day="2022-11-01", nat="non_eu",meas="share",typ="%",geo="london",decimals=0)`%).
 
 <br/>
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
-
-
 
 
 ## Overview in London {.tabset}
 <br/>
 
-The number of payrolled employments held by non-UK nationals living in London was generally increasing between 2014 and 2020, even following the EU exit vote. However, the introduction of coronavirus (COVID-19) lockdown measures coincided with a decline in payrolled employments for all nationality groups.
+The share of employments in London held by non-UK workers has slowly been increasing long-term, from `r pull_data_det(dt_day="2014-07-01",nat="non_uk",typ="%",meas="share")`% in July 2014 to `r pull_data_det(dt_day="2022-12-01",nat="non_uk",typ="%",meas="share")`% in July 2022. However, the composition between EU and non-EU workers has been shifting throughout this time.
+
+
 
 - The number of employments held by EU workers increased from `r pull_data_det(dt_day="2014-07-01",nat="eu",meas="counts")` in July 2014 to `r pull_data_det(dt_day="2020-02-01",nat="eu",meas="counts")` in February 2020, before falling to `r pull_data_det(dt_day="2021-06-01",nat="eu",meas="counts")` in June 2021.
 - The number of employments held by non-EU workers* over the same period was `r pull_data_det(dt_day="2014-07-01",nat="non_eu",meas="counts")` (July 2014), `r pull_data_det(dt_day="2020-02-01",nat="non_eu",meas="counts")` (February 2020), and `r pull_data_det(dt_day="2021-06-01",nat="non_eu",meas="counts")` (June 2021). 
@@ -82,7 +65,7 @@ The introduction of lockdown measures in March 2020 had a particular impact on t
 london_charts[["london_trend_counts"]]
 
 # All charts will have the same caption, so do not copy elsewhere. If modification needed, rename appropriately.
-figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical line indicates beginning of lockdowns in March 2020.")
+figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical lines indicates beginning of lockdowns in March 2020 and end of free migration in January 2021, respectively.")
 
 ```
 
@@ -210,6 +193,57 @@ figcap3 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time 
 
 <br/>
 
+## Table of employments in London
+
+```{r london employments table, echo=FALSE, fig.cap = tabcap1, out.width='100%'}
+
+table_list$employments_table
+
+
+
+tabcap1 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Comparison is to November 2019 when the number of employments with EU and non-EU nationals were the same.")
+                  
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## Understanding the data
+<br/>
+
+HM Revenue and Customs (HMRC) has published statistics on [payrolled employments in the UK by region, industry and nationality](https://www.gov.uk/government/statistics/uk-payrolled-employments-by-nationality-region-and-industry-from-july-2014-to-december-2022), including data on the period from June 2021 to December 2022. This article explores some of the key trends for London.
+
+Please note, the payrolled employment counts used in this article cannot be:
+
+-  directly compared with payrolled employee numbers - payrolled employees can have multiple payrolled employments, so employment counts follow the same trend as employee counts, but will be higher.
+
+-  directly compared with total jobs numbers - these statistics only include employments from the PAYE system, they do not include employments from non-payrolled sources such as self-employment. 
+
+-  used as a count of monthly or annual migration to the UK or London, or to show the number of non-UK nationals who are currently living in the UK or London.
+
+Nationality breakdowns are determined using HMRC’s Migrant Worker Scan (MWS). Nationality is reported by individuals when they register for a National Insurance number and may change following registration. 
+
+The data has not been seasonally adjusted.
+
+<br/>
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## Key dates
+<br/>
+
+This release concerns the movement of workers from abroad, including the EU, to the UK. In this context, the following dates are relevant, with most related to the process of the UK leaving the EU.
+
+- 23 June 2016 - the UK held a referendum and 52% of those who voted chose to leave the EU.
+
+- 31 January 2020 - the UK left the EU and entered a transition period.
+
+- 23 March 2020 - the first COVID-19 lockdown was announced and the Coronavirus Job Retention Scheme was introduced.
+
+- 31 December 2020 - the transition period ended and the UK left the EU single market and customs union. Free movement between the EU and the UK ended.
+
+- 1 January 2021 - the UK introduced a new, points-based immigration system.
+
+<br/>
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
 ::: {.tocify-extend-page data-unique="tocify-extend-page" style="height: 0;"}
 :::

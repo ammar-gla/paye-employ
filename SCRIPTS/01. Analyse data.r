@@ -27,8 +27,6 @@
                                    sheet = region_sheets[[region]], skip=3) %>%
       clean_names()     %>%
       filter(date != "End of worksheet") %>% 
-      rename_with(~str_replace(., "information_and_communication","in_information_and_communication")) %>% 
-      rename_with(~str_replace(., "industry_administrative_and_support_services","in_administrative_and_support_services")) %>% 
       rename_with(~str_c(., "_in_overall"),ends_with("_counts")) %>% # Ensuring there is also a suffix for overall
       rename_with(~str_replace(.,"total_",""),!contains("total_employment")) %>% 
       mutate(across(where(is.character) & !date, 
@@ -100,8 +98,14 @@
              section == "administrative_and_support_services" ~ "Administration",
              section == "accommodation_and_food_service_activities" ~ "Hospitality",
              section == "water_supply_sewerage_and_waste" ~ "Water",
-             TRUE ~ str_to_title(gsub("_"," ",section)))) %>% 
-             arrange(geo_rank, geography,section,date_day) %>% 
+             section == "households_extraterritorial_organisations_and_unknown_entities" ~ "Households",
+             section == "energy_production_and_supply" ~ "Energy",
+             section == "mining_and_quarrying" ~ "Mining",
+             section == "agriculture_forestry_and_fishing" ~ "Agriculture",
+             TRUE ~ str_to_title(gsub("_"," ",section))),
+           non_uk_nationals_employment_counts = rowSums(across(c(eu_nationals_employment_counts,non_eu_nationals_employment_counts)),na.rm = TRUE),
+           non_uk_nationals_employment_share = rowSums(across(c(eu_nationals_employment_share,non_eu_nationals_employment_share)),na.rm = TRUE)) %>% 
+             arrange(geo_rank, geography,section,date_day,) %>% 
     relocate(date,date_day,geography,geography_name,section,section_name)
   
   #.............................................................................
@@ -109,7 +113,7 @@
   #.............................................................................
   
   # Specify vector which defines the order wanted for nationality
-  nat_names <- c("Total","UK","EU","Non-EU")
+  nat_names <- c("Total","UK","EU","Non-EU","Non-UK")
   
   # Note: data will be made longer by the nationality type and count/share measure type
   paye_master_long_detail <- paye_master_long %>% 
@@ -120,10 +124,15 @@
                                        TRUE ~ measure_value-measure_value[date_day=="2020-02-01"]),
            p_change_feb20 =  case_when(date_day<="2020-02-01" | measure_name=="share" ~ NA_real_,
                                        TRUE ~ 100* (measure_value-measure_value[date_day=="2020-02-01"])/(measure_value[date_day=="2020-02-01"])),
+           d_change_nov19 =  case_when(date_day<="2019-11-01" ~ NA_real_,
+                                       TRUE ~ measure_value-measure_value[date_day=="2019-11-01"]), #the month where EU=non-EU count
+           p_change_nov19 =  case_when(date_day<="2019-11-01" | measure_name=="share" ~ NA_real_,
+                                       TRUE ~ 100* (measure_value-measure_value[date_day=="2019-11-01"])/(measure_value[date_day=="2019-11-01"])),
            index_feb20 = case_when(date_day<"2020-02-01" | measure_name=="share" ~ NA_real_,
                                    TRUE ~ 100* (measure_value)/(measure_value[date_day=="2020-02-01"])),
            nationality_name = case_when(nationality == "overall" ~ "Total",
                                         nationality == "non_eu" ~ "Non-EU",
+                                        nationality == "non_uk" ~ "Non-UK",
                                         TRUE ~ toupper(nationality))) %>% 
     ungroup() %>% 
     arrange(geography,section,factor(nationality,levels=nat_names),date_day,measure_name) %>% 
@@ -452,7 +461,8 @@
     
     # Produce chart
     region_facet <- paye_master_long_detail %>% 
-      filter(geography_name == dat_region & section_name %in% top_sections & measure_name == "counts" & date_day>="2020-01-01" ) %>% 
+      filter(geography_name == dat_region & section_name %in% top_sections & measure_name == "counts" 
+             & nationality_name %in% nat_names_sort & date_day>="2020-01-01" ) %>% 
       ggplot(mapping = aes(text = paste(
                              nationality_name, "\n",
                              format(date_day,"%b-%y"), "\n",
@@ -597,7 +607,8 @@
     
     
     section_change_bar <- paye_master_long_detail %>%
-      filter( geography_name == dat_region & date_day == max(date_day) & measure_name == "counts" & section_name %in% top_sections)  %>% 
+      filter( geography_name == dat_region & date_day == max(date_day) & measure_name == "counts" 
+              & nationality_name %in% nat_names_sort & section_name %in% top_sections)  %>% 
       ggplot(mapping = aes(x =  factor(section_name,levels=rev(top_sections_sort)), 
                            y = p_change_feb20, 
                            colour = factor(nationality_name,levels=rev(nat_names_sort)), #since horizontal bar reverses orders, we need to reverse too
@@ -713,6 +724,10 @@
                  linetype = "dotted",
                  size = 1 * mm_to_pt,
                  colour = rgb(166,166,166,maxColorValue = 255)) + # mark lockdowns start
+      geom_vline(aes(xintercept = as.numeric(ymd("2021-01-01"))),
+                 linetype = "dotted",
+                 size = 1 * mm_to_pt,
+                 colour = rgb(166,166,166,maxColorValue = 255)) + # mark end of free movement
       coord_cartesian(clip = 'off') +
       scale_y_continuous(limit=yscale,labels = dollar_format(prefix = "", 
                                                              largest_with_cents = 1,
@@ -759,5 +774,33 @@
   # Shares chart
   lond_trend(var="share")
 
+  #.............................................................................
+  # 03. Tables ----
+  #.............................................................................
+  
+  table_list <- list()
+  
+  # Overview table by sector with number of employments by nationality
+  # As flextable like in CCLB
+  
+  # Table should have industries in rows and two columns for each nationality:
+  ## Count in London and change since November 2019 where EU=Non-EU counts
+  nat_table_data <- paye_master_long_detail %>% 
+    filter(date_day==max(date_day) & geography_name=="London" & measure_name=="counts" & nationality %in% c("uk","eu","non_eu")) %>% 
+    select(section_name,nationality,measure_value,p_change_nov19) %>% 
+    pivot_wider(names_from = nationality,values_from = c(measure_value,p_change_nov19)) %>%
+    mutate(across(contains("measure_value"), ~value_form(.,s=5)),
+           across(contains("p_change"),~paste0(perc_form(.),"%"))) %>% 
+    rbind(NA) %>% #add empty row
+    mutate(rank = case_when(section_name == "Overall" ~ 1,
+                            is.na(section_name) ~ 2,
+                            TRUE ~ rank(section_name)+2)) %>% 
+    dplyr::arrange(rank,section_name) %>% 
+    relocate(rank,section_name,contains("uk"),contains("eu"),contains("non_eu"))
+  
+  
+  table_list <- list(table_list,
+                     "employments_table"=nat_table_func(nat_table_data))
+  
 
   
