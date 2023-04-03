@@ -109,7 +109,7 @@
     relocate(date,date_day,geography,geography_name,section,section_name)
   
   #.............................................................................
-  # Expand the dataset by calculating changes since pandemic began (taken as Feb 2020 in PAYE)
+  # Expand the dataset by calculating changes since pandemic began (taken as Dec 2019 in PAYE)
   #.............................................................................
   
   # Specify vector which defines the order wanted for nationality
@@ -124,12 +124,14 @@
                                        TRUE ~ measure_value-measure_value[date_day=="2020-02-01"]),
            p_change_feb20 =  case_when(date_day<="2020-02-01" | measure_name=="share" ~ NA_real_,
                                        TRUE ~ 100* (measure_value-measure_value[date_day=="2020-02-01"])/(measure_value[date_day=="2020-02-01"])),
-           d_change_nov19 =  case_when(date_day<="2019-11-01" ~ NA_real_,
-                                       TRUE ~ measure_value-measure_value[date_day=="2019-11-01"]), #the month where EU=non-EU count
-           p_change_nov19 =  case_when(date_day<="2019-11-01" | measure_name=="share" ~ NA_real_,
-                                       TRUE ~ 100* (measure_value-measure_value[date_day=="2019-11-01"])/(measure_value[date_day=="2019-11-01"])),
            index_feb20 = case_when(date_day<"2020-02-01" | measure_name=="share" ~ NA_real_,
                                    TRUE ~ 100* (measure_value)/(measure_value[date_day=="2020-02-01"])),
+           d_change_dec19 =  case_when(date_day<="2019-12-01" ~ NA_real_,
+                                       TRUE ~ measure_value-measure_value[date_day=="2019-12-01"]), #the month where EU=non-EU count
+           p_change_dec19 =  case_when(date_day<="2019-12-01" | measure_name=="share" ~ NA_real_,
+                                       TRUE ~ 100* (measure_value-measure_value[date_day=="2019-12-01"])/(measure_value[date_day=="2019-12-01"])),
+           index_dec19 = case_when(date_day<"2019-12-01" | measure_name=="share" ~ NA_real_,
+                                   TRUE ~ 100* (measure_value)/(measure_value[date_day=="2019-12-01"])),
            nationality_name = case_when(nationality == "overall" ~ "Total",
                                         nationality == "non_eu" ~ "Non-EU",
                                         nationality == "non_uk" ~ "Non-UK",
@@ -462,14 +464,14 @@
     # Produce chart
     region_facet <- paye_master_long_detail %>% 
       filter(geography_name == dat_region & section_name %in% top_sections & measure_name == "counts" 
-             & nationality_name %in% nat_names_sort & date_day>="2020-01-01" ) %>% 
+             & nationality_name %in% nat_names_sort & date_day>="2019-12-01" ) %>% 
       ggplot(mapping = aes(text = paste(
                              nationality_name, "\n",
                              format(date_day,"%b-%y"), "\n",
-                             "Index: ", value_form(index_feb20,s=4,d=1),"\n",
+                             "Index: ", value_form(index_dec19,s=4,d=1),"\n",
                              sep = ""))) +
       ggla_line(aes(x = date_day,
-                    y = index_feb20, 
+                    y = index_dec19, 
                     group = nationality_name,
                     colour = nationality_name,
                     size = nationality_name)) +
@@ -488,7 +490,7 @@
       theme(plot.margin = unit(c(1,1,1,1), "cm"),
             panel.spacing = unit(1,"lines")) %>% 
       labs(title = paste0("Employment by nationality within ", dat_region),
-           subtitle = paste0("Payrolled employments in selected industries, indexed to Feb 2020"),
+           subtitle = paste0("Payrolled employments in selected industries, indexed to Dec 2019"),
            caption = "PAYE RTI data") +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
@@ -555,7 +557,7 @@
         layout(title = list(text = paste0("<b>","Employment by nationality within ", dat_region,"</b>",
                                           "<br>",
                                           "<sup>",
-                                          paste0("Payrolled employments in selected industries, indexed to Feb 2020"),
+                                          paste0("Payrolled employments in selected industries, indexed to Dec 2019"),
                                           "</sup>",
                                           "<br>"),
                             font = list(size = 22),
@@ -590,7 +592,7 @@
       filter(geography_name == dat_region & date_day==max(date_day) & measure_name=="counts" & nationality=="overall") %>% 
       arrange(desc(measure_value)) %>% 
       slice_head(n=n_top) %>% # Overall is guaranteed to be top no matter what
-      arrange(desc(p_change_feb20)) %>% # Sort sectors with largest perc. change first
+      arrange(desc(p_change_dec19)) %>% # Sort sectors with largest perc. change first
       pull(section_name)
     
     top_sections_sort <- c("Overall",setdiff(top_sections,c("Overall"))) # Ensure overall is first
@@ -610,12 +612,12 @@
       filter( geography_name == dat_region & date_day == max(date_day) & measure_name == "counts" 
               & nationality_name %in% nat_names_sort & section_name %in% top_sections)  %>% 
       ggplot(mapping = aes(x =  factor(section_name,levels=rev(top_sections_sort)), 
-                           y = p_change_feb20, 
+                           y = p_change_dec19, 
                            colour = factor(nationality_name,levels=rev(nat_names_sort)), #since horizontal bar reverses orders, we need to reverse too
                            fill = factor(nationality_name,levels=rev(nat_names_sort)),
                            text = paste(section_name, "\n",
                                         "Nationality: ",nationality_name, "\n",
-                                        "Change: ", perc_form(p_change_feb20),"%", "\n",
+                                        "Change: ", perc_form(p_change_dec19),"%", "\n",
                                         sep = "")))   +
       geom_bar(stat = "identity", position = position_dodge(), width=0.5)+ # bars
       coord_flip()  + # flip to horizontal
@@ -641,7 +643,7 @@
        guides(colour=guide_legend(reverse=TRUE),
               fill=guide_legend(reverse=TRUE)) +
       labs(title = paste0("Payrolled employments percentage change by industry in ",dat_region),
-           subtitle = paste0("Change by nationality Feb 2020-",last_date_month),
+           subtitle = paste0("Change by nationality Dec 2019-",last_date_month),
            caption = "\nSource: HMRC PAYE RTI.")+
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     section_change_bar
@@ -654,7 +656,7 @@
         layout(title = list(text = paste0("<b>","Payrolled employments percentage change by industry in ",dat_region,"</b>",
                                           "<br>",
                                           "<sup>",
-                                          paste0("Change by nationality Feb 2020-",last_date_month," top ", n_top-1, " industries"),
+                                          paste0("Change by nationality Dec 2019-",last_date_month," top ", n_top-1, " industries"),
                                           "</sup>",
                                           "<br>"),
                             font = list(size = 22),

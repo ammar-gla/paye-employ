@@ -115,9 +115,9 @@ london_charts[["emp_shares_Construction"]]
 ## Recent trends across industries {.tabset}
 <br/>
 
-There is variation in how payrolled employment counts have evolved across industries since the start of the coronavirus pandemic. 
+There is variation in how payrolled employment counts have evolved across industries over the past three years, in part due to the pandemic and the end of free migration.
 
-The charts below show trends for a selection of industries from February 2020 to June 2021. By June 2021, the number of payrolled employments in London had increased in some industries (e.g. Construction, Health) but remained well below pre-pandemic levels in others (e.g. Hospitality).
+The charts below show trends for a selection of industries from December 2019 to December 2022. By December 2022, the number of payrolled employments in London had increased in some industries (e.g. Construction, Health) but remained well below pre-pandemic levels in others (e.g. Hospitality).
 
 Focusing on trends by nationality, the number of payrolled employments held by EU nationals generally recovered less well over this period. There was a particularly sharp drop in EU nationals in London working in the Hospitality sector.
 
