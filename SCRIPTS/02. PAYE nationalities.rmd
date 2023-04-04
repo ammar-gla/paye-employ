@@ -47,7 +47,7 @@ Following the post-lockdown decrease in payrolled employments overall, the numbe
 
 -  In December 2019, there were almost the same number of payrolled employments held by both EU and non-EU nationals living in London, each accounting for around `r pull_data_det(dt_day="2019-12-01",nat="eu",meas="share",typ="%",geo="london",decimals=0)`%  of all employments
 
--  By December 2022, EU nationals accounted for around `r pull_data_det(dt_day="2022-11-01",nat="eu",meas="counts")` employments (`r pull_data_det(dt_day="2022-11-01", nat="eu",meas="share",typ="%",geo="london",decimals=0)`%) while non-EU nationals accounted for `r pull_data_det(dt_day="2022-11-01",nat="non_eu",meas="counts")` employments (`r pull_data_det(dt_day="2022-11-01", nat="non_eu",meas="share",typ="%",geo="london",decimals=0)`%).
+-  By December 2022, EU nationals accounted for around `r pull_data_det(dt_day="2022-12-01",nat="eu",meas="counts")` employments (`r pull_data_det(dt_day="2022-12-01", nat="eu",meas="share",typ="%",geo="london",decimals=0)`%) while non-EU nationals accounted for `r pull_data_det(dt_day="2022-12-01",nat="non_eu",meas="counts")` employments (`r pull_data_det(dt_day="2022-12-01", nat="non_eu",meas="share",typ="%",geo="london",decimals=0)`%).
 
 - The total share of employments held by non-UK nationals has increased throughout the data period, from `r pull_data_det(dt_day="2014-07-01",nat="non_uk",meas="share",typ="%")`% in July 2014 to `r pull_data_det(dt_day="2022-12-01",nat="non_uk",meas="share",typ="%")`% in December 2022.
 
@@ -199,7 +199,7 @@ figcap3 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time 
 ## Table of employments
 <br/>
 
-The table below shows the number of employments by nationality in London in December 2022. As the data is not seasonally adjusted, we compare with levels in December 2019 to avoid potential biases related to seasonal employment. The comparison is also useful as December 2019 also saw EU and non-EU employments at nearly the same level.
+The table below shows the number of employments by nationality in London in December 2022. As the data is not seasonally adjusted, we compare with levels in December 2019 to avoid potential biases related to seasonal employment. The comparison is also practical as December 2019 also saw EU and non-EU employments at nearly the same level.
 
 <a href="#top">Back to top</a>
 
