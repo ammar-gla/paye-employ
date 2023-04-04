@@ -730,6 +730,10 @@
                  linetype = "dotted",
                  size = 1 * mm_to_pt,
                  colour = rgb(166,166,166,maxColorValue = 255)) + # mark end of free movement
+      geom_vline(aes(xintercept = as.numeric(ymd("2016-06-01"))),
+                 linetype = "dotted",
+                 size = 1 * mm_to_pt,
+                 colour = rgb(166,166,166,maxColorValue = 255)) + # Brexit vote
       coord_cartesian(clip = 'off') +
       scale_y_continuous(limit=yscale,labels = dollar_format(prefix = "", 
                                                              largest_with_cents = 1,
@@ -802,7 +806,7 @@
   
   
   table_list <- list(table_list,
-                     "employments_table"=nat_table_func(nat_table_data))
+                     "london_table"=nat_table_func(nat_table_data))
   
 
   
