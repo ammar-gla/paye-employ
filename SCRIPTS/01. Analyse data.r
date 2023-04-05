@@ -792,21 +792,31 @@
   # Table should have industries in rows and two columns for each nationality:
   ## Count in London and change since November 2019 where EU=Non-EU counts
   nat_table_data <- paye_master_long_detail %>% 
-    filter(date_day==max(date_day) & geography_name=="London" & measure_name=="counts" & nationality %in% c("uk","eu","non_eu")) %>% 
-    select(section_name,nationality,measure_value,p_change_dec19) %>% 
+    filter(date_day==max(date_day) & geography %in% c("london","uk") & measure_name=="counts" & nationality %in% c("uk","eu","non_eu")) %>% 
+    select(section_name,geography,nationality,measure_value,p_change_dec19) %>% 
     pivot_wider(names_from = nationality,values_from = c(measure_value,p_change_dec19)) %>%
     mutate(across(contains("measure_value"), ~value_form(.,s=5)),
            across(contains("p_change"),~paste0(perc_form(.),"%"))) %>% 
     rbind(NA) %>% #add empty row
     mutate(rank = case_when(section_name == "Overall" ~ 1,
                             is.na(section_name) ~ 2,
-                            TRUE ~ rank(section_name)+2)) %>% 
-    dplyr::arrange(rank,section_name) %>% 
+                            TRUE ~ floor(rank(section_name)+2))) %>% 
+    dplyr::arrange(rank,section_name,geography) %>% 
     relocate(rank,section_name,contains("uk"),contains("eu"),contains("non_eu"))
+  
+  nat_table_data_lon <- nat_table_data %>% 
+    filter(geography %in% c("london",NA_character_)) %>% 
+    select(-geography)
+    
+  nat_table_data_uk <- nat_table_data %>% 
+    filter(geography%in% c("uk",NA_character_)) %>% 
+    select(-geography)
+    
   
   
   table_list <- list(table_list,
-                     "london_table"=nat_table_func(nat_table_data))
+                     "london_table"=nat_table_func(nat_table_data_lon),
+                     "uk_table"=nat_table_func(nat_table_data_uk))
   
 
   
