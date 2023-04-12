@@ -87,19 +87,6 @@ figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time I
 
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
-### Non-UK employment counts
-
-```{r london nuk overview count, echo= FALSE, fig.cap = figcap, out.width='100%'}
-
-london_charts[["london_trend_counts_nuk"]]
-
-# All charts will have the same caption, so do not copy elsewhere. If modification needed, rename appropriately.
-figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical lines indicate Brexit vote of June 2016, beginning of lockdowns in March 2020, and end of free movement in January 2021, respectively.")
-
-```
-
-<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
-
 ### Nationality shares
 
 ```{r london overview share, echo= FALSE, fig.cap = figcap, out.width='100%'}

@@ -776,13 +776,11 @@
   
   
   
-  nats_used <- c("Non-UK","Non-EU","EU")
+  nats_used <- c("Non-EU","EU")
   
-  pal <- c(  #Four categories: overall, UK, EU, non-EU, but let the latter be shades of a colour
-    gla_pal(gla_theme = "default", palette_type = "categorical", n = 1), #
-    gla_pal(gla_theme = "default", palette_type = "quantitative", main_colours = "ldndkpink", n = 2))
+  pal <- gla_pal(gla_theme = "default", palette_type = "quantitative", main_colours = "ldndkpink", n = 2)
   
-  pal_named <- c("Non-UK"=pal[1],"EU"=pal[2],"Non-EU"=pal[3])
+  pal_named <- c("EU"=pal[1],"Non-EU"=pal[2])
   
   # nats_used <- c("EU","Non-EU")
   # 
@@ -792,13 +790,13 @@
   
   # Counts chart
   lond_trend(var="counts",
-             yscale=c(600e3,2e6),
+             yscale=c(600e3,1.1e6),
              chart_nm = "eu")
 
 
   # Shares chart
   lond_trend(var="share",
-             yscale=c(14,50),
+             yscale=c(14,24),
              chart_nm = "eu")
   
   # non-UK alone
