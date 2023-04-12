@@ -683,19 +683,21 @@
   # Create trend chart for London nationalities overall
   #.............................................................................
   
-  nats_used <- c("EU","Non-EU")
-  
-  pal <- gla_pal(gla_theme = "default", palette_type = "categorical", n = 2)
-  pal_named <- setNames(object=pal,nm = nats_used)
-  
   # Define function
-  lond_trend <- function(var, sufx="",subtitle,yscale, ch_n=chart_n, l_ch=london_charts) {
+  lond_trend <- function(var,
+                         sufx="",
+                         subtitle,
+                         yscale,
+                         ch_n=chart_n,
+                         l_ch=london_charts,
+                         pal_nm=pal_named,
+                         nats=nats_used,
+                         chart_nm=NULL) {
     
     if (var =="share") {
       sufx <-  "%"
       desc <- "Share: "
       subtitle <- "Nationality as share of total payrolled employments"
-      yscale <- c(15,24)
       f_x <- function(x) {
         perc_form(x)
       }  
@@ -704,16 +706,16 @@
       sufx <-  ""
       desc <- "Count: "
       subtitle <- "Count of total payrolled employments"
-      yscale <- c(600000,1.1e6)
       f_x <- function(x) {
         value_form(x,s=3)
       }
     }
     
-    chart_name <- paste0("london_trend_",var)
+    chart_name <- paste0("london_trend_",var,"_",chart_nm)
     
     trend_chart <- paye_master_long_detail %>% 
-      filter(geography_name == "London" & section_name == "Overall" & measure_name == var & nationality_name %in% nats_used) %>% 
+      filter(geography_name == "London" & section_name == "Overall" & measure_name == var &
+               nationality_name %in% nats) %>% 
       ggplot(mapping = aes(x = date_day, y = measure_value, 
                            group = nationality_name,
                            text = paste("Nationality: ",nationality_name, "\n",
@@ -721,7 +723,7 @@
                                         desc,f_x(measure_value),sufx, "\n",
                                         sep = ""))) +
       ggla_line(aes(colour = nationality_name))+
-      scale_colour_manual(values = pal_named)+
+      scale_colour_manual(values = pal_nm)+
       geom_vline(aes(xintercept = as.numeric(ymd("2020-03-01"))),
                  linetype = "dotted",
                  size = 1 * mm_to_pt,
@@ -735,8 +737,7 @@
                  size = 1 * mm_to_pt,
                  colour = rgb(166,166,166,maxColorValue = 255)) + # Brexit vote
       coord_cartesian(clip = 'off') +
-      scale_y_continuous(limit=yscale,labels = dollar_format(prefix = "", 
-                                                             largest_with_cents = 1,
+      scale_y_continuous(limit=yscale,labels = comma_format(largest_with_cents = 1,
                                                              suffix = sufx)) +
       scale_x_date(date_labels = "%b %y",date_breaks = "1 year") +
       theme(plot.margin = unit(c(1,1,1,1), "cm"))+
@@ -773,12 +774,59 @@
     #assign(chart_n,ch_n, envir = .GlobalEnv)
   }
   
+  
+  
+  nats_used <- c("Non-UK","Non-EU","EU")
+  
+  pal <- c(  #Four categories: overall, UK, EU, non-EU, but let the latter be shades of a colour
+    gla_pal(gla_theme = "default", palette_type = "categorical", n = 1), #
+    gla_pal(gla_theme = "default", palette_type = "quantitative", main_colours = "ldndkpink", n = 2))
+  
+  pal_named <- c("Non-UK"=pal[1],"EU"=pal[2],"Non-EU"=pal[3])
+  
+  # nats_used <- c("EU","Non-EU")
+  # 
+  # pal <- gla_pal(gla_theme = "default", palette_type = "categorical", n = 2)
+  # pal_named <- setNames(object=pal,nm = nats_used)
+  
+  
   # Counts chart
-  lond_trend(var="counts")
+  lond_trend(var="counts",
+             yscale=c(600e3,2e6),
+             chart_nm = "eu")
 
 
   # Shares chart
-  lond_trend(var="share")
+  lond_trend(var="share",
+             yscale=c(14,50),
+             chart_nm = "eu")
+  
+  # non-UK alone
+  nats_used <- c("Non-UK")
+  
+  pal <- c(  #Four categories: overall, UK, EU, non-EU, but let the latter be shades of a colour
+    gla_pal(gla_theme = "default", palette_type = "categorical", n = 1))
+  
+  pal_named <- c("Non-UK"=pal[1])
+  
+  # Counts chart
+  lond_trend(var="counts",
+             yscale=c(1.3e6,1.9e6),
+             chart_nm = "nuk")
+  
+  
+  # non-UK alongside UK
+  nats_used <- c("Non-UK","UK")
+  
+  pal <- c(  #Four categories: overall, UK, EU, non-EU, but let the latter be shades of a colour
+    gla_pal(gla_theme = "default", palette_type = "categorical", n = 1))
+  
+  pal_named <- c("Non-UK"=pal[1],"UK"="#cccccc")
+  
+  # Counts chart
+  lond_trend(var="counts",
+             yscale=c(1.3e6,2.8e6),
+             chart_nm = "uk")
 
   #.............................................................................
   # 03. Tables ----

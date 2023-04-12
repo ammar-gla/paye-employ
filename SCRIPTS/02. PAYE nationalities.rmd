@@ -35,9 +35,9 @@ Over the first three years of this period, the number of employments held by EU 
 
 Four years later, it was well below 800,000 again, while non-EU employments rose to above a million.
 
-While most London industries have recovered to pre-pandemic levels of employments, some have seen a radical change in the composition of nationalities. Hospitality has lost 30% of employments held by EU workers but gained almost 40% held by non-EU workers.
+Some industries have seen a large change in the size and composition of the non-UK workforce. In particular, hospitality has lost 30% of employments held by EU workers but gained almost 40% held by non-EU workers.
 
-The changes are less stark when considering the UK average as the rest of the UK historically had a far lower share of EU workers than London, at around `r pull_data_det(dt_day="2019-12-01",nat="eu",meas="share",typ="%",geo="uk",decimals=0)`% vs. `r pull_data_det(dt_day="2019-12-01",nat="eu",meas="share",typ="%",geo="london",decimals=0)`% in December 2019.
+The rest of the UK still has much lower shares of EU and non-EU jobs than London, but growth in non-EU jobs has been faster than in London.
 
 <br/>
 
@@ -61,11 +61,37 @@ Following the post-lockdown decrease in payrolled employments overall, the numbe
 
 <foot>*Note: The count of non-EU employments include those held by workers from countries part of the EEA but not the EU. </foot>
 
-### Total employment counts
+### Non-UK employment counts
 
 ```{r london overview count, echo= FALSE, fig.cap = figcap, out.width='100%'}
 
-london_charts[["london_trend_counts"]]
+london_charts[["london_trend_counts_eu"]]
+
+# All charts will have the same caption, so do not copy elsewhere. If modification needed, rename appropriately.
+figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical lines indicate Brexit vote of June 2016, beginning of lockdowns in March 2020, and end of free movement in January 2021, respectively.")
+
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+### Total employment counts
+
+```{r london uk overview count, echo= FALSE, fig.cap = figcap, out.width='100%'}
+
+london_charts[["london_trend_counts_uk"]]
+
+# All charts will have the same caption, so do not copy elsewhere. If modification needed, rename appropriately.
+figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical lines indicate Brexit vote of June 2016, beginning of lockdowns in March 2020, and end of free movement in January 2021, respectively.")
+
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+### Non-UK employment counts
+
+```{r london nuk overview count, echo= FALSE, fig.cap = figcap, out.width='100%'}
+
+london_charts[["london_trend_counts_nuk"]]
 
 # All charts will have the same caption, so do not copy elsewhere. If modification needed, rename appropriately.
 figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical lines indicate Brexit vote of June 2016, beginning of lockdowns in March 2020, and end of free movement in January 2021, respectively.")
@@ -78,7 +104,7 @@ figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time I
 
 ```{r london overview share, echo= FALSE, fig.cap = figcap, out.width='100%'}
 
-london_charts[["london_trend_share"]]
+london_charts[["london_trend_share_eu"]]
 
 
 ```
@@ -143,7 +169,7 @@ There is variation in how payrolled employment counts have evolved across indust
 
 The charts below show trends for a selection of industries from December 2019 to December 2022. Most sectors saw employments fall during the lockdown periods in 2020 and 2021, with noted exceptions in Construction and Health, both of which also saw increases in employments held by EU nationals well into 2021. 
 
-Hospitality saw the steepest falls during the pandemic, as it was particularly vulnerable to movement controls due to its large share of EU workers. The increase in UK and non-EU workers in 2022 nevertheless lifted the overall level of employments above pre-pandemic levels.
+Hospitality saw the steepest falls during the pandemic. The increase in UK and non-EU workers in 2022 later lifted the overall level of employments above pre-pandemic levels.
 
 
 <a href="#top">Back to top</a>
@@ -204,7 +230,9 @@ figcap3 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time 
 ## Table of employments {.tabset}
 <br/>
 
-The table below shows the number of employments by nationality in London and the UK in December 2022. As the data is not seasonally adjusted, we compare with levels in December 2019 to avoid potential biases related to seasonal employment. The comparison is also practical as December 2019 also saw EU and non-EU employments at nearly the same level.
+The table below shows the number of employments by nationality in London and the UK in December 2022. 
+
+As the data is not seasonally adjusted, we compare with levels in December 2019 to avoid potential biases related to seasonal employment. The comparison is also practical as December 2019 saw EU and non-EU employments at nearly the same level.
 
 <a href="#top">Back to top</a>
 
@@ -241,7 +269,7 @@ tabcap1 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time 
 
 HM Revenue and Customs (HMRC) has published statistics on [payrolled employments in the UK by region, industry and nationality](https://www.gov.uk/government/statistics/uk-payrolled-employments-by-nationality-region-and-industry-from-july-2014-to-december-2022) with data on the period from June 2014 to December 2022. This article explores some of the key trends for London.
 
-[Condensed ONS definition]
+'>>>>>>>[CONDENSED ONS DEFINITION]<<<<<<<<<<'
 
 Please note, the payrolled employment counts used in this article cannot be:
 
