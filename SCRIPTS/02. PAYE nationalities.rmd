@@ -245,7 +245,7 @@ table_list$uk_table
 
 
 
-tabcap1 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Comparison is to December 2019 when the number of employments with EU and non-EU nationals were roughly equal")
+tabcap1 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Comparison is to December 2019 when the number of employments with EU and non-EU nationals were roughly equal.")
                   
 ```
 

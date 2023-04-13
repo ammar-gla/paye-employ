@@ -743,7 +743,8 @@
       theme(plot.margin = unit(c(1,1,1,1), "cm"))+
       labs(title = paste0("Employment by nationality within London"),
            subtitle = subtitle,
-           caption = "PAYE RTI data, non-seasonally adjusted.") +
+           caption = paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally \nadjusted) and Migrant Worker Scan.",
+                            "\n\nNote: Estimates are based on where employees live. Comparison is to December 2019 when \nthe number of employments with EU and non-EU nationals were roughly equal.")) +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
     ggsave(here::here(IMAGES,"ad_hoc",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
