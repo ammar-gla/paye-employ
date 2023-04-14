@@ -27,17 +27,17 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ## Summary
 <br/>
 
-The share of jobs held by workers living in London with EU nationalities has fallen but been more than offset by a rising share held by other non-UK nationalities over the last three years, according to the latest data released by the ONS.
+The share of jobs held by workers living in London with EU nationalities has fallen but has been more than offset by a rising share held by other non-UK nationalities over the last three years, according to the latest data released by HMRC.
 
 This release is an update of our [previous analysis](https://data.london.gov.uk/download/gla-economics-covid-19-labour-market-analysis/df64d525-e65c-4dd6-a6e5-270919aeab7e/PAYE%20Employments%20by%20nationality.html) on the nationality of workers in payrolled employments living in London, which now covers the period from July 2014 to December 2022. This includes two years of the new points-based immigration regime implemented in January 2021.*
 
-Over the first three years of this period, the number of employments held by EU workers in London rose from around 620,000 to around 830,000, the same as the number of employments held by non-EU workers.
+Over the first four years of this period, up to mid 2018, the number of employments held by EU workers in London rose sharply from around 620,000 to around 830,000, surpassing the number of employments held by non-EU workers.
 
-Four years later, it was well below 800,000 again, while non-EU employments rose to above a million.
+Four years later, by December 2022, it was well below 800,000 again, while non-EU employments rose to above a million.
 
 Some industries have seen a large change in the size and composition of the non-UK workforce. In particular, hospitality has lost 30% of employments held by EU workers but gained almost 40% held by non-EU workers.
 
-The rest of the UK still has much lower shares of EU and non-EU jobs than London, but growth in non-EU jobs has been faster than in London.
+The rest of the UK still has much lower shares of EU and non-EU jobs than London, but the rate of growth in non-EU jobs has been faster than in London.
 
 <br/>
 
@@ -102,9 +102,9 @@ london_charts[["london_trend_share_eu"]]
 ## Regional comparisons {.tabset}
 <br/>
 
-The UK has on average experienced a higher rate of growth in employments held by non-EU workers than London itself in recent years. Nevertheless, London continues to employ a much larger share of non-UK workers than the rest of the UK.
+The UK has on average experienced a higher rate of growth in employments held by non-EU workers than London itself in recent years. Nevertheless, there continues to be a much larger share of non-UK workers living in London than in the rest of the UK.
 
-In December 2022, `r pull_data_det(nat="eu",meas="share",typ="%",geo="london")`% of payrolled employments in London were held by EU nationals and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="london")`% were held by non-EU nationals. In both cases, this was much higher than the UK average (`r pull_data_det(nat="eu",meas="share",typ="%",geo="uk")`% and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="uk")`%, respectively).
+In December 2022, `r pull_data_det(nat="eu",meas="share",typ="%",geo="london")`% of resident payrolled employments in London were held by EU nationals and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="london")`% were held by non-EU nationals. In both cases, this was much higher than the UK average (`r pull_data_det(nat="eu",meas="share",typ="%",geo="uk")`% and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="uk")`%, respectively).
 
 These differences are mirrored within industries such as Hospitality, while being even more pronounced within other industries, such as Construction:
 
@@ -154,12 +154,14 @@ london_charts[["emp_shares_Construction"]]
 
 There is variation in how payrolled employment counts have evolved across industries over the past three years, coinciding with the pandemic, the end of free movement for EU citizens, and the introduction of a new points-based immigration system.
 
-The charts below show trends for a selection of industries from December 2019 to December 2022. Most sectors saw employments fall during the lockdown periods in 2020 and 2021, with noted exceptions in Construction and Health, both of which also saw increases in employments held by EU nationals well into 2021. 
+The charts below show trends for a selection of industries from December 2019 to December 2022. Most sectors saw total employments fall during the lockdown periods in 2020 and 2021, with noted exceptions in Construction and Health, both of which also saw increases in employments held by EU nationals well into 2021. 
 
-Hospitality saw the steepest falls during the pandemic. The increase in UK and non-EU workers in 2022 later lifted the overall level of employments above pre-pandemic levels.
+Hospitality saw the steepest falls during the pandemic. The increase in UK and non-EU workers* in 2022 later lifted the overall level of employments above pre-pandemic levels. 
 
 
 <a href="#top">Back to top</a>
+
+<foot>*Note: The [Migration Oservatory](https://migrationobservatory.ox.ac.uk/resources/reports/how-is-the-end-of-free-movement-affecting-the-low-wage-labour-force-in-the-uk/) noted that the increase in employments held by non-EU nationals will not necessarily be people arriving on newly issued work visas.</foot>
 
 ### Selected industries in London
 ```{r london facets, echo=FALSE, fig.cap = figcap3, out.width='100%'}
