@@ -27,8 +27,6 @@
                                    sheet = region_sheets[[region]], skip=3) %>%
       clean_names()     %>%
       filter(date != "End of worksheet") %>% 
-      rename_with(~str_replace(., "information_and_communication","in_information_and_communication")) %>% 
-      rename_with(~str_replace(., "industry_administrative_and_support_services","in_administrative_and_support_services")) %>% 
       rename_with(~str_c(., "_in_overall"),ends_with("_counts")) %>% # Ensuring there is also a suffix for overall
       rename_with(~str_replace(.,"total_",""),!contains("total_employment")) %>% 
       mutate(across(where(is.character) & !date, 
@@ -100,16 +98,22 @@
              section == "administrative_and_support_services" ~ "Administration",
              section == "accommodation_and_food_service_activities" ~ "Hospitality",
              section == "water_supply_sewerage_and_waste" ~ "Water",
-             TRUE ~ str_to_title(gsub("_"," ",section)))) %>% 
-             arrange(geo_rank, geography,section,date_day) %>% 
+             section == "households_extraterritorial_organisations_and_unknown_entities" ~ "Households",
+             section == "energy_production_and_supply" ~ "Energy",
+             section == "mining_and_quarrying" ~ "Mining",
+             section == "agriculture_forestry_and_fishing" ~ "Agriculture",
+             TRUE ~ str_to_title(gsub("_"," ",section))),
+           non_uk_nationals_employment_counts = rowSums(across(c(eu_nationals_employment_counts,non_eu_nationals_employment_counts)),na.rm = TRUE),
+           non_uk_nationals_employment_share = rowSums(across(c(eu_nationals_employment_share,non_eu_nationals_employment_share)),na.rm = TRUE)) %>% 
+             arrange(geo_rank, geography,section,date_day,) %>% 
     relocate(date,date_day,geography,geography_name,section,section_name)
   
   #.............................................................................
-  # Expand the dataset by calculating changes since pandemic began (taken as Feb 2020 in PAYE)
+  # Expand the dataset by calculating changes since pandemic began (taken as Dec 2019 in PAYE)
   #.............................................................................
   
   # Specify vector which defines the order wanted for nationality
-  nat_names <- c("Total","UK","EU","Non-EU")
+  nat_names <- c("Total","UK","EU","Non-EU","Non-UK")
   
   # Note: data will be made longer by the nationality type and count/share measure type
   paye_master_long_detail <- paye_master_long %>% 
@@ -122,8 +126,15 @@
                                        TRUE ~ 100* (measure_value-measure_value[date_day=="2020-02-01"])/(measure_value[date_day=="2020-02-01"])),
            index_feb20 = case_when(date_day<"2020-02-01" | measure_name=="share" ~ NA_real_,
                                    TRUE ~ 100* (measure_value)/(measure_value[date_day=="2020-02-01"])),
+           d_change_dec19 =  case_when(date_day<="2019-12-01" ~ NA_real_,
+                                       TRUE ~ measure_value-measure_value[date_day=="2019-12-01"]), #the month where EU=non-EU count
+           p_change_dec19 =  case_when(date_day<="2019-12-01" | measure_name=="share" ~ NA_real_,
+                                       TRUE ~ 100* (measure_value-measure_value[date_day=="2019-12-01"])/(measure_value[date_day=="2019-12-01"])),
+           index_dec19 = case_when(date_day<"2019-12-01" | measure_name=="share" ~ NA_real_,
+                                   TRUE ~ 100* (measure_value)/(measure_value[date_day=="2019-12-01"])),
            nationality_name = case_when(nationality == "overall" ~ "Total",
                                         nationality == "non_eu" ~ "Non-EU",
+                                        nationality == "non_uk" ~ "Non-UK",
                                         TRUE ~ toupper(nationality))) %>% 
     ungroup() %>% 
     arrange(geography,section,factor(nationality,levels=nat_names),date_day,measure_name) %>% 
@@ -452,14 +463,15 @@
     
     # Produce chart
     region_facet <- paye_master_long_detail %>% 
-      filter(geography_name == dat_region & section_name %in% top_sections & measure_name == "counts" & date_day>="2020-01-01" ) %>% 
+      filter(geography_name == dat_region & section_name %in% top_sections & measure_name == "counts" 
+             & nationality_name %in% nat_names_sort & date_day>="2019-12-01" ) %>% 
       ggplot(mapping = aes(text = paste(
                              nationality_name, "\n",
                              format(date_day,"%b-%y"), "\n",
-                             "Index: ", value_form(index_feb20,s=4,d=1),"\n",
+                             "Index: ", value_form(index_dec19,s=4,d=1),"\n",
                              sep = ""))) +
       ggla_line(aes(x = date_day,
-                    y = index_feb20, 
+                    y = index_dec19, 
                     group = nationality_name,
                     colour = nationality_name,
                     size = nationality_name)) +
@@ -471,14 +483,14 @@
                  size = 1 * mm_to_pt,
                  colour = rgb(166,166,166,maxColorValue = 255)) + # mark lockdowns start
       coord_cartesian(clip = 'off') +
-      scale_y_continuous(limits = c(60, 140),labels = dollar_format(prefix = "", 
+      scale_y_continuous(limits = c(62, 149),labels = dollar_format(prefix = "", 
                                                                   largest_with_cents = 1,
                                                                   suffix = "")) +
       scale_x_date(date_labels = "%b'%y",date_breaks = "9 months" ) +
       theme(plot.margin = unit(c(1,1,1,1), "cm"),
             panel.spacing = unit(1,"lines")) %>% 
       labs(title = paste0("Employment by nationality within ", dat_region),
-           subtitle = paste0("Payrolled employments in selected industries, indexed to Feb 2020"),
+           subtitle = paste0("Payrolled employments in selected industries, indexed to Dec 2019"),
            caption = "PAYE RTI data") +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
@@ -545,7 +557,7 @@
         layout(title = list(text = paste0("<b>","Employment by nationality within ", dat_region,"</b>",
                                           "<br>",
                                           "<sup>",
-                                          paste0("Payrolled employments in selected industries, indexed to Feb 2020"),
+                                          paste0("Payrolled employments in selected industries, indexed to Dec 2019"),
                                           "</sup>",
                                           "<br>"),
                             font = list(size = 22),
@@ -580,7 +592,7 @@
       filter(geography_name == dat_region & date_day==max(date_day) & measure_name=="counts" & nationality=="overall") %>% 
       arrange(desc(measure_value)) %>% 
       slice_head(n=n_top) %>% # Overall is guaranteed to be top no matter what
-      arrange(desc(p_change_feb20)) %>% # Sort sectors with largest perc. change first
+      arrange(desc(p_change_dec19)) %>% # Sort sectors with largest perc. change first
       pull(section_name)
     
     top_sections_sort <- c("Overall",setdiff(top_sections,c("Overall"))) # Ensure overall is first
@@ -597,14 +609,15 @@
     
     
     section_change_bar <- paye_master_long_detail %>%
-      filter( geography_name == dat_region & date_day == max(date_day) & measure_name == "counts" & section_name %in% top_sections)  %>% 
+      filter( geography_name == dat_region & date_day == max(date_day) & measure_name == "counts" 
+              & nationality_name %in% nat_names_sort & section_name %in% top_sections)  %>% 
       ggplot(mapping = aes(x =  factor(section_name,levels=rev(top_sections_sort)), 
-                           y = p_change_feb20, 
+                           y = p_change_dec19, 
                            colour = factor(nationality_name,levels=rev(nat_names_sort)), #since horizontal bar reverses orders, we need to reverse too
                            fill = factor(nationality_name,levels=rev(nat_names_sort)),
                            text = paste(section_name, "\n",
                                         "Nationality: ",nationality_name, "\n",
-                                        "Change: ", perc_form(p_change_feb20),"%", "\n",
+                                        "Change: ", perc_form(p_change_dec19),"%", "\n",
                                         sep = "")))   +
       geom_bar(stat = "identity", position = position_dodge(), width=0.5)+ # bars
       coord_flip()  + # flip to horizontal
@@ -630,7 +643,7 @@
        guides(colour=guide_legend(reverse=TRUE),
               fill=guide_legend(reverse=TRUE)) +
       labs(title = paste0("Payrolled employments percentage change by industry in ",dat_region),
-           subtitle = paste0("Change by nationality Feb 2020-",last_date_month),
+           subtitle = paste0("Change by nationality Dec 2019-",last_date_month),
            caption = "\nSource: HMRC PAYE RTI.")+
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     section_change_bar
@@ -643,7 +656,7 @@
         layout(title = list(text = paste0("<b>","Payrolled employments percentage change by industry in ",dat_region,"</b>",
                                           "<br>",
                                           "<sup>",
-                                          paste0("Change by nationality Feb 2020-",last_date_month," top ", n_top-1, " industries"),
+                                          paste0("Change by nationality Dec 2019-",last_date_month," top ", n_top-1, " industries"),
                                           "</sup>",
                                           "<br>"),
                             font = list(size = 22),
@@ -670,19 +683,21 @@
   # Create trend chart for London nationalities overall
   #.............................................................................
   
-  nats_used <- c("EU","Non-EU")
-  
-  pal <- gla_pal(gla_theme = "default", palette_type = "categorical", n = 2)
-  pal_named <- setNames(object=pal,nm = nats_used)
-  
   # Define function
-  lond_trend <- function(var, sufx="",subtitle,yscale, ch_n=chart_n, l_ch=london_charts) {
+  lond_trend <- function(var,
+                         sufx="",
+                         subtitle,
+                         yscale,
+                         ch_n=chart_n,
+                         l_ch=london_charts,
+                         pal_nm=pal_named,
+                         nats=nats_used,
+                         chart_nm=NULL) {
     
     if (var =="share") {
       sufx <-  "%"
       desc <- "Share: "
       subtitle <- "Nationality as share of total payrolled employments"
-      yscale <- c(15,24)
       f_x <- function(x) {
         perc_form(x)
       }  
@@ -691,16 +706,16 @@
       sufx <-  ""
       desc <- "Count: "
       subtitle <- "Count of total payrolled employments"
-      yscale <- c(600000,1.1e6)
       f_x <- function(x) {
         value_form(x,s=3)
       }
     }
     
-    chart_name <- paste0("london_trend_",var)
+    chart_name <- paste0("london_trend_",var,"_",chart_nm)
     
     trend_chart <- paye_master_long_detail %>% 
-      filter(geography_name == "London" & section_name == "Overall" & measure_name == var & nationality_name %in% nats_used) %>% 
+      filter(geography_name == "London" & section_name == "Overall" & measure_name == var &
+               nationality_name %in% nats) %>% 
       ggplot(mapping = aes(x = date_day, y = measure_value, 
                            group = nationality_name,
                            text = paste("Nationality: ",nationality_name, "\n",
@@ -708,20 +723,28 @@
                                         desc,f_x(measure_value),sufx, "\n",
                                         sep = ""))) +
       ggla_line(aes(colour = nationality_name))+
-      scale_colour_manual(values = pal_named)+
+      scale_colour_manual(values = pal_nm)+
       geom_vline(aes(xintercept = as.numeric(ymd("2020-03-01"))),
                  linetype = "dotted",
                  size = 1 * mm_to_pt,
                  colour = rgb(166,166,166,maxColorValue = 255)) + # mark lockdowns start
+      geom_vline(aes(xintercept = as.numeric(ymd("2021-01-01"))),
+                 linetype = "dotted",
+                 size = 1 * mm_to_pt,
+                 colour = rgb(166,166,166,maxColorValue = 255)) + # mark end of free movement
+      geom_vline(aes(xintercept = as.numeric(ymd("2016-06-01"))),
+                 linetype = "dotted",
+                 size = 1 * mm_to_pt,
+                 colour = rgb(166,166,166,maxColorValue = 255)) + # Brexit vote
       coord_cartesian(clip = 'off') +
-      scale_y_continuous(limit=yscale,labels = dollar_format(prefix = "", 
-                                                             largest_with_cents = 1,
+      scale_y_continuous(limit=yscale,labels = comma_format(largest_with_cents = 1,
                                                              suffix = sufx)) +
       scale_x_date(date_labels = "%b %y",date_breaks = "1 year") +
       theme(plot.margin = unit(c(1,1,1,1), "cm"))+
       labs(title = paste0("Employment by nationality within London"),
            subtitle = subtitle,
-           caption = "PAYE RTI data, non-seasonally adjusted.") +
+           caption = paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally \nadjusted) and Migrant Worker Scan.",
+                            "\n\nNote: Estimates are based on where employees live. Vertical lines indicate Brexit vote of June 2016, \nbeginning of lockdowns in March 2020, and end of free movement in January 2021, respectively.")) +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
     ggsave(here::here(IMAGES,"ad_hoc",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
@@ -752,12 +775,95 @@
     #assign(chart_n,ch_n, envir = .GlobalEnv)
   }
   
+  
+  
+  nats_used <- c("Non-EU","EU")
+  
+  pal <- gla_pal(gla_theme = "default", palette_type = "quantitative", main_colours = "ldndkpink", n = 2)
+  
+  pal_named <- c("EU"=pal[1],"Non-EU"=pal[2])
+  
+  # nats_used <- c("EU","Non-EU")
+  # 
+  # pal <- gla_pal(gla_theme = "default", palette_type = "categorical", n = 2)
+  # pal_named <- setNames(object=pal,nm = nats_used)
+  
+  
   # Counts chart
-  lond_trend(var="counts")
+  lond_trend(var="counts",
+             yscale=c(600e3,1.1e6),
+             chart_nm = "eu")
 
 
   # Shares chart
-  lond_trend(var="share")
+  lond_trend(var="share",
+             yscale=c(14,24),
+             chart_nm = "eu")
+  
+  # non-UK alone
+  nats_used <- c("Non-UK")
+  
+  pal <- c(  #Four categories: overall, UK, EU, non-EU, but let the latter be shades of a colour
+    gla_pal(gla_theme = "default", palette_type = "categorical", n = 1))
+  
+  pal_named <- c("Non-UK"=pal[1])
+  
+  # Counts chart
+  lond_trend(var="counts",
+             yscale=c(1.3e6,1.9e6),
+             chart_nm = "nuk")
+  
+  
+  # non-UK alongside UK
+  nats_used <- c("Non-UK","UK")
+  
+  pal <- c(  #Four categories: overall, UK, EU, non-EU, but let the latter be shades of a colour
+    gla_pal(gla_theme = "default", palette_type = "categorical", n = 1))
+  
+  pal_named <- c("Non-UK"=pal[1],"UK"="#cccccc")
+  
+  # Counts chart
+  lond_trend(var="counts",
+             yscale=c(1.3e6,2.8e6),
+             chart_nm = "uk")
 
+  #.............................................................................
+  # 03. Tables ----
+  #.............................................................................
+  
+  table_list <- list()
+  
+  # Overview table by sector with number of employments by nationality
+  # As flextable like in CCLB
+  
+  # Table should have industries in rows and two columns for each nationality:
+  ## Count in London and change since November 2019 where EU=Non-EU counts
+  nat_table_data <- paye_master_long_detail %>% 
+    filter(date_day==max(date_day) & geography %in% c("london","uk") & measure_name=="counts" & nationality %in% c("uk","eu","non_eu")) %>% 
+    select(section_name,geography,nationality,measure_value,p_change_dec19) %>% 
+    pivot_wider(names_from = nationality,values_from = c(measure_value,p_change_dec19)) %>%
+    mutate(across(contains("measure_value"), ~value_form(.,s=5)),
+           across(contains("p_change"),~paste0(perc_form(.),"%"))) %>% 
+    rbind(NA) %>% #add empty row
+    mutate(rank = case_when(section_name == "Overall" ~ 1,
+                            is.na(section_name) ~ 2,
+                            TRUE ~ floor(rank(section_name)+2))) %>% 
+    dplyr::arrange(rank,section_name,geography) %>% 
+    relocate(rank,section_name,contains("uk"),contains("eu"),contains("non_eu"))
+  
+  nat_table_data_lon <- nat_table_data %>% 
+    filter(geography %in% c("london",NA_character_)) %>% 
+    select(-geography)
+    
+  nat_table_data_uk <- nat_table_data %>% 
+    filter(geography%in% c("uk",NA_character_)) %>% 
+    select(-geography)
+    
+  
+  
+  table_list <- list(table_list,
+                     "london_table"=nat_table_func(nat_table_data_lon),
+                     "uk_table"=nat_table_func(nat_table_data_uk))
+  
 
   

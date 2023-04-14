@@ -22,67 +22,66 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 ```
 
-<br/>
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
-## Summary of key points
+## Summary
 <br/>
 
-- The introduction of lockdown measures in March 2020 coincided with decreases in the number of payrolled employments in London, particularly for employments held by EU nationals.
+The share of jobs held by workers living in London with EU nationalities has fallen but has been more than offset by a rising share held by other non-UK nationalities over the last three years, according to the latest data released by HMRC.
 
--  By June 2021, there were `r pull_data_det(dt_day="2021-06-01",nat="eu",meas="counts")` payrolled employments held by EU nationals living in the capital and `r pull_data_det(dt_day="2021-06-01",nat="non_eu",meas="counts")` held by non-EU (and non-UK) nationals.
+This release is an update of our [previous analysis](https://data.london.gov.uk/download/gla-economics-covid-19-labour-market-analysis/df64d525-e65c-4dd6-a6e5-270919aeab7e/PAYE%20Employments%20by%20nationality.html) on the nationality of workers in payrolled employments living in London, which now covers the period from July 2014 to December 2022. This includes two years of the new points-based immigration regime implemented in January 2021.*
 
--  This accounted for around `r pull_data_det(nat="eu",meas="share",typ="%",geo="london",decimals=0)`% and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="london",decimals=0)`% of total employments in London - for both EU and non-EU workers, these shares were far higher than for other UK regions.
+Over the first four years of this period, up to mid 2018, the number of employments held by EU workers in London rose sharply from around 620,000 to around 830,000, surpassing the number of employments held by non-EU workers.
+
+Four years later, by December 2022, it was well below 800,000 again, while non-EU employments rose to above a million.
+
+Some industries have seen a large change in the size and composition of the non-UK workforce. In particular, hospitality has lost 30% of employments held by EU workers but gained almost 40% held by non-EU workers.
+
+The rest of the UK still has much lower shares of EU and non-EU jobs than London, but the rate of growth in non-EU jobs has been faster than in London.
 
 <br/>
+
+<foot>*See [Data notes] for a definition of payrolled employments. </foot>
+
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
-## Introduction
+## London overview {.tabset}
 <br/>
 
-HM Revenue and Customs (HMRC) has published new statistics on [payrolled employments in the UK by region, industry and nationality, from July 2014 to June 2021](https://www.gov.uk/government/statistics/payrolled-employments-in-the-uk-by-region-industry-and-nationality-from-july-2014-to-june-2021). This article explores some of the key trends for London.
+Following the post-lockdown decrease in payrolled employments overall, the number of employments held by non-EU*  workers rose steadily from January 2021 onwards while the number of EU employments stabilised. This period coincided with the end of free movement for EU citizens.
 
-Please note, the payrolled employment counts used in this article cannot be:
+-  In December 2019, there were almost the same number of payrolled employments held by both EU and non-EU nationals living in London, each accounting for around `r pull_data_det(dt_day="2019-12-01",nat="eu",meas="share",typ="%",geo="london",decimals=0)`%  of all employments
 
--  directly compared with payrolled employee numbers - payrolled employees can have multiple payrolled employments, so employment counts follow the same trend as employee counts, but will be higher.
+-  By December 2022, EU nationals accounted for around `r pull_data_det(dt_day="2022-12-01",nat="eu",meas="counts")` employments (`r pull_data_det(dt_day="2022-12-01", nat="eu",meas="share",typ="%",geo="london")`%) while non-EU nationals accounted for `r pull_data_det(dt_day="2022-12-01",nat="non_eu",meas="counts")` employments (`r pull_data_det(dt_day="2022-12-01", nat="non_eu",meas="share",typ="%",geo="london")`%).
 
--  directly compared with total jobs numbers - these statistics only include employments from the PAYE system, they do not include employments from non-payrolled sources such as self-employment. 
-
--  used as a count of monthly or annual migration to the UK or London, or to show the number of non-UK nationals who are currently living in the UK or London.
-
-Nationality breakdowns are determined using HMRC’s Migrant Worker Scan (MWS). Nationality is reported by individuals when they register for a National Insurance number and may change following registration. 
-
-The data covers the period from June 2014 to June 2021 and has not been seasonally adjusted. For more information, see the [HMRC release](https://www.gov.uk/government/statistics/payrolled-employments-in-the-uk-by-region-industry-and-nationality-from-july-2014-to-june-2021).
-
-<br/>
-<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+- The total share of employments held by non-UK nationals has increased throughout the data period, from `r pull_data_det(dt_day="2014-07-01",nat="non_uk",meas="share",typ="%")`% in July 2014 to `r pull_data_det(dt_day="2022-12-01",nat="non_uk",meas="share",typ="%")`% in December 2022.
 
 
-
-
-## Overview in London {.tabset}
-<br/>
-
-The number of payrolled employments held by non-UK nationals living in London was generally increasing between 2014 and 2020, even following the EU exit vote. However, the introduction of coronavirus (COVID-19) lockdown measures coincided with a decline in payrolled employments for all nationality groups.
-
-- The number of employments held by EU workers increased from `r pull_data_det(dt_day="2014-07-01",nat="eu",meas="counts")` in July 2014 to `r pull_data_det(dt_day="2020-02-01",nat="eu",meas="counts")` in February 2020, before falling to `r pull_data_det(dt_day="2021-06-01",nat="eu",meas="counts")` in June 2021.
-- The number of employments held by non-EU workers* over the same period was `r pull_data_det(dt_day="2014-07-01",nat="non_eu",meas="counts")` (July 2014), `r pull_data_det(dt_day="2020-02-01",nat="non_eu",meas="counts")` (February 2020), and `r pull_data_det(dt_day="2021-06-01",nat="non_eu",meas="counts")` (June 2021). 
-
-The introduction of lockdown measures in March 2020 had a particular impact on the count of payrolled employments held by EU nationals living in the capital. Between February 2020 and February 2021:
-
-- The overall count of payrolled employments held by employees living in London (including UK nationals) decreased by `r pull_data_det(var="p_change_feb20",dt_day="2021-02-01",nat="overall",meas="counts",typ="%")`%.
-- The number of employments held by EU and non-EU workers decreased by `r pull_data_det(var="p_change_feb20",dt_day="2021-02-01",nat="eu",meas="counts",typ="%")`% and `r pull_data_det(var="p_change_feb20",dt_day="2021-02-01",nat="non_eu",meas="counts",typ="%")`%, respectively.
+<a href="#top">Back to top</a>
 
 <foot>*Note: The count of non-EU employments include those held by workers from countries part of the EEA but not the EU. </foot>
 
-### Total employment counts
+### Non-UK employment counts
 
 ```{r london overview count, echo= FALSE, fig.cap = figcap, out.width='100%'}
 
-london_charts[["london_trend_counts"]]
+london_charts[["london_trend_counts_eu"]]
 
 # All charts will have the same caption, so do not copy elsewhere. If modification needed, rename appropriately.
-figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical line indicates beginning of lockdowns in March 2020.")
+figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical lines indicate Brexit vote of June 2016, beginning of lockdowns in March 2020, and end of free movement in January 2021, respectively.")
+
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+### Total employment counts
+
+```{r london uk overview count, echo= FALSE, fig.cap = figcap, out.width='100%'}
+
+london_charts[["london_trend_counts_uk"]]
+
+# All charts will have the same caption, so do not copy elsewhere. If modification needed, rename appropriately.
+figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical lines indicate Brexit vote of June 2016, beginning of lockdowns in March 2020, and end of free movement in January 2021, respectively.")
 
 ```
 
@@ -92,7 +91,7 @@ figcap <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time I
 
 ```{r london overview share, echo= FALSE, fig.cap = figcap, out.width='100%'}
 
-london_charts[["london_trend_share"]]
+london_charts[["london_trend_share_eu"]]
 
 
 ```
@@ -103,14 +102,17 @@ london_charts[["london_trend_share"]]
 ## Regional comparisons {.tabset}
 <br/>
 
-Notwithsanding the impacts of the pandemic, London still has a relatively large population of non-UK workers compared to other UK regions and countries. 
+The UK has on average experienced a higher rate of growth in employments held by non-EU workers than London itself in recent years. Nevertheless, there continues to be a much larger share of non-UK workers living in London than in the rest of the UK.
 
-By June 2021, `r pull_data_det(nat="eu",meas="share",typ="%",geo="london")`% of payrolled employments in London were held by EU nationals and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="london")`% were held by non-EU nationals. In both cases, this was higher than the UK average (`r pull_data_det(nat="eu",meas="share",typ="%",geo="uk")`% and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="uk")`%, respectively).
+In December 2022, `r pull_data_det(nat="eu",meas="share",typ="%",geo="london")`% of resident payrolled employments in London were held by EU nationals and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="london")`% were held by non-EU nationals. In both cases, this was much higher than the UK average (`r pull_data_det(nat="eu",meas="share",typ="%",geo="uk")`% and `r pull_data_det(nat="non_eu",meas="share",typ="%",geo="uk")`%, respectively).
 
-These differences are even more pronounced within certain industries, including for Hospitality and Construction. In June 2021:
+These differences are mirrored within industries such as Hospitality, while being even more pronounced within other industries, such as Construction:
 
 - The share of payrolled employments held by non-UK workers in Hospitality was `r 100-as.numeric(pull_data_det(nat="uk",meas="share",typ="%",abs=FALSE,sec="Hospitality"))`% in London, more than double the UK share of `r 100-as.numeric(pull_data_det(geo="uk",nat="uk",meas="share",typ="%",abs=FALSE,sec="Hospitality"))`%.
 - The share of payrolled employments held by non-UK workers in Construction was `r 100-as.numeric(pull_data_det(nat="uk",meas="share",typ="%",abs=FALSE,sec="Construction"))`% in London, four times the UK average of `r 100-as.numeric(pull_data_det(geo="uk",nat="uk",meas="share",typ="%",abs=FALSE,sec="Construction"))`%.
+
+
+<a href="#top">Back to top</a>
 
 ### Regional comparison, overall
 
@@ -147,20 +149,26 @@ london_charts[["emp_shares_Construction"]]
 
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
-## Recent trends across industries {.tabset}
+## Trends across industries {.tabset}
 <br/>
 
-There is variation in how payrolled employment counts have evolved across industries since the start of the coronavirus pandemic. 
+There is variation in how payrolled employment counts have evolved across industries over the past three years, coinciding with the pandemic, the end of free movement for EU citizens, and the introduction of a new points-based immigration system.
 
-The charts below show trends for a selection of industries from February 2020 to June 2021. By June 2021, the number of payrolled employments in London had increased in some industries (e.g. Construction, Health) but remained well below pre-pandemic levels in others (e.g. Hospitality).
+The charts below show trends for a selection of industries from December 2019 to December 2022. Most sectors saw total employments fall during the lockdown periods in 2020 and 2021, with noted exceptions in Construction and Health, both of which also saw increases in employments held by EU nationals well into 2021. 
 
-Focusing on trends by nationality, the number of payrolled employments held by EU nationals generally recovered less well over this period. There was a particularly sharp drop in EU nationals in London working in the Hospitality sector.
+Hospitality saw the steepest falls during the pandemic. The increase in UK and non-EU workers* in 2022 later lifted the overall level of employments above pre-pandemic levels. 
 
+
+<a href="#top">Back to top</a>
+
+<foot>*Note: The [Migration Oservatory](https://migrationobservatory.ox.ac.uk/resources/reports/how-is-the-end-of-free-movement-affecting-the-low-wage-labour-force-in-the-uk/) noted that the increase in employments held by non-EU nationals will not necessarily be people arriving on newly issued work visas.</foot>
 
 ### Selected industries in London
-```{r london facets, echo=FALSE, fig.cap = figcap, out.width='100%'}
+```{r london facets, echo=FALSE, fig.cap = figcap3, out.width='100%'}
 
 london_charts[["fac_London"]]
+
+figcap3 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Vertical line indicates  beginning of lockdowns in March 2020.")
 
 ```
 
@@ -168,7 +176,7 @@ london_charts[["fac_London"]]
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
 ### Selected industries in the UK
-```{r uk facets, echo=FALSE, fig.cap = figcap, out.width='100%'}
+```{r uk facets, echo=FALSE, fig.cap = figcap3, out.width='100%'}
 
 london_charts[["fac_UK"]]
 
@@ -177,21 +185,21 @@ london_charts[["fac_UK"]]
 
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
-## Recent trends by nationality in London 
+## Trends by nationality in London 
 
 <br/>
 
-Looking at the percentage change in payrolled employments from February 2020 to June 2021 across the ten largest industries in London, these sectoral differences become even clearer.
+Looking at the percentage change in payrolled employments from December 2019 to December 2022 across the ten largest industries in London, these sectoral differences become even clearer.
 
-* Construction saw the largest rate of growth in payrolled employments at `r pull_data_det(var="p_change_feb20",nat="overall",meas="counts",typ="%",abs=TRUE,sec="Construction")`%. Over this time, the number of employment held by EU and non-EU nationals increased by `r pull_data_det(var="p_change_feb20",nat="eu",meas="counts",typ="%",abs=TRUE,sec="Construction")`% and `r pull_data_det(var="p_change_feb20",nat="non_eu",meas="counts",typ="%",abs=TRUE,sec="Construction")`%, respectively.
-* Hospitality recorded the largest decrease in payrolled employments at `r pull_data_det(var="p_change_feb20",nat="overall",meas="counts",typ="%",abs=TRUE,sec="Hospitality")`%. This was driven by a particularly sharp drop in the number of employments held by EU nationals, which fell by `r pull_data_det(var="p_change_feb20",nat="eu",meas="counts",typ="%",abs=TRUE,sec="Hospitality")`%.
+* Health saw the largest growth in payrolled employments at `r pull_data_det(var="p_change_feb20",nat="overall",meas="counts",typ="%",abs=TRUE,sec="Health")`%. Over this time, the number of employment held by EU and non-EU nationals increased by `r pull_data_det(var="p_change_feb20",nat="eu",meas="counts",typ="%",abs=TRUE,sec="Health")`% and `r pull_data_det(var="p_change_feb20",nat="non_eu",meas="counts",typ="%",abs=TRUE,sec="Health")`%, respectively.
+* Transport & storage recorded the largest decrease in payrolled employments at `r pull_data_det(var="p_change_feb20",nat="overall",meas="counts",typ="%",abs=TRUE,sec="Transport & storage")`%. This decrease was largely unrelated to movement trends as most employments were were held by UK workers.
 
-<br/>
+<a href="#top">Back to top</a>
 
 ::: {.infobox .info_symbol}
 
 Note: payrolled employment counts cannot be compared with counts of total jobs. 
-For the latest data on total jobs counts, see our [Labour Market Update](https://data.london.gov.uk/download/gla-economics-covid-19-labour-market-analysis/6ee07998-076c-49ff-bf8d-9f16935e31b6/LMU%20March%202022.html) release.
+For the latest data on total jobs counts, see our [Labour Market Update](https://data.london.gov.uk/download/gla-economics-covid-19-labour-market-analysis/f9a85842-2897-4513-9f55-7e03d0626123/LMU%20March%202023.html) release.
 
 :::
 
@@ -208,7 +216,85 @@ figcap3 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time 
 
 <hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
 
+## Table of employments {.tabset}
 <br/>
+
+The table below shows the number of employments by nationality in London and the UK in December 2022. 
+
+As the data is not seasonally adjusted, we compare with levels in December 2019 to avoid potential biases related to seasonal employment. The comparison is also practical as December 2019 saw EU and non-EU employments at nearly the same level.
+
+<a href="#top">Back to top</a>
+
+### London employments
+
+```{r london employments table, echo=FALSE, fig.cap = tabcap1, out.width='100%'}
+
+table_list$london_table
+
+
+
+tabcap1 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Comparison is to December 2019 when the number of employments with EU and non-EU nationals were roughly equal")
+                  
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+### UK employments
+
+```{r uk employments table, echo=FALSE, fig.cap = tabcap1, out.width='100%'}
+
+table_list$uk_table
+
+
+
+tabcap1 <- paste0("Source: HM Revenue and Customs – Pay As You Earn Real Time Information (non-seasonally adjusted) and Migrant Worker Scan.","<br>","<br>", "Note: Estimates are based on where employees live. Comparison is to December 2019 when the number of employments with EU and non-EU nationals were roughly equal.")
+                  
+```
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## Data notes
+<br/>
+
+HM Revenue and Customs (HMRC) has published statistics on [payrolled employments in the UK by region, industry and nationality](https://www.gov.uk/government/statistics/uk-payrolled-employments-by-nationality-region-and-industry-from-july-2014-to-december-2022) with data on the period from June 2014 to December 2022. This article explores some of the key trends for London.
+
+Payrolled employment counts are a measure of payrolled employee jobs and are calculated based on the proportion of each month in which the employment was being worked.
+
+Please note, the payrolled employment counts used in this article cannot be:
+
+-  directly compared with payrolled employee numbers - payrolled employees can have multiple payrolled employments, so employment counts follow the same trend as employee counts, but will be higher.
+
+-  directly compared with total jobs numbers - these statistics only include employments from the PAYE system, they do not include employments from non-payrolled sources such as self-employment. 
+
+-  used as a count of monthly or annual migration to the UK or London, or to show the number of non-UK nationals who are currently living in the UK or London.
+
+Nationality breakdowns are determined using HMRC’s Migrant Worker Scan (MWS). Nationality is reported by individuals when they register for a National Insurance number and may change following registration. 
+
+The data has not been seasonally adjusted.
+
+<a href="#top">Back to top</a>
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
+## Key dates
+<br/>
+
+This release concerns the movement of workers from abroad to the UK. The following dates are relevant in this context as they affected movement rights, which includes the process of the UK leaving the EU.
+
+- 23 June 2016 - the UK held a referendum and 52% of those who voted chose to leave the EU.
+
+- 31 January 2020 - the UK left the EU and entered a transition period.
+
+- 23 March 2020 - the first COVID-19 lockdown was announced and the Coronavirus Job Retention Scheme was introduced.
+
+- 31 December 2020 - the transition period ended and the UK left the EU single market and customs union. Free movement between the EU and the UK ended.
+
+- 1 January 2021 - the UK introduced a new, points-based immigration system.
+
+<a href="#top">Back to top</a>
+
+<hr  width="100%" style="background-color: rgb(134,139,142);height: 1.0px;margin: 0;"/>
+
 
 
 ::: {.tocify-extend-page data-unique="tocify-extend-page" style="height: 0;"}

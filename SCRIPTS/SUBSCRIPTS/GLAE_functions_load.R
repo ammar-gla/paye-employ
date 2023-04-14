@@ -305,6 +305,52 @@ correct_facets <- function(chart,max_fac_num=9) {
   chart <<- chart_temp
 }
 
+# Create react_table with employment counts
+nat_table_func <- function(dataset_name=NULL) {
+  
+  if (is.null(dataset_name)) {
+    stop("Specify compatible dataset name")
+  }
+  
+  reactable(dataset_name, #Settings for the tables
+            pagination = FALSE,
+            wrap = TRUE,
+            striped = TRUE,
+            defaultColDef = colDef(
+              align = "right",
+              width = 80,
+              headerStyle = list(align="center"),
+              sortNALast = TRUE
+            ),
+            style=list(fontSize=14,fontFamily="Arial"),
+            highlight = TRUE,
+            columns = list( #the below gives proper names to columns and formats
+              "rank" = colDef(name = knitr::asis_output("\U25BC"),
+                              width = 40,
+                              style = list(color=rgb(0,0,0,alpha=0,max=255))),
+              "section_name" = colDef(name = "Industry",width = 200,filterable = FALSE,align = "left"),
+              "measure_value_uk"= colDef(name = "Employments Dec '22 (#)",
+                                         width = 115),
+              "p_change_dec19_uk"= colDef(name = "Change since Dec '19",
+                                          width = 105),
+              "measure_value_eu"= colDef(name = "Employments Dec '22 (#)",
+                                         width = 115),
+              "p_change_dec19_eu"= colDef(name = "Change since Dec '19",
+                                          width = 105),
+              "measure_value_non_eu"= colDef(name = "Employments Dec '22 (#)",
+                                             width = 115),
+              "p_change_dec19_non_eu"= colDef(name = "Change since Dec '19",
+                                              width = 105)),
+            columnGroups = list( #Providers column group names
+              colGroup(name = "UK nationals",
+                       columns=c("measure_value_uk","p_change_dec19_uk")),
+              colGroup(name = "EU nationals",
+                       columns=c("measure_value_eu","p_change_dec19_eu")),
+              colGroup(name = "Non-EU nationals",
+                       columns=c("measure_value_non_eu","p_change_dec19_non_eu")))
+  )
+}
+
 #.............................................................................
 ### Charting functions ----
 #.............................................................................
