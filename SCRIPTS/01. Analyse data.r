@@ -179,13 +179,14 @@
     theme_set(theme_gla(gla_theme = "default"))
     
     # Loop through each nationality type
-    for (share_pop in c("uk","eu","non_eu")) {
+    for (share_pop in c("UK","EU","Non-EU")) {
       
       # Clean name for labelling in chart
-      pop_name <- toupper(gsub("_","-",share_pop))
-      share_var <- paste0(share_pop,"_nationals_employment_share")
-      count_var <- paste0(share_pop,"_nationals_employment_counts")
-      chart_name <- paste0(share_pop,"_",dat_section)
+      
+      var_name <- tolower(gsub("-","_",share_pop))
+      share_var <- paste0(var_name,"_nationals_employment_share")
+      count_var <- paste0(var_name,"_nationals_employment_counts")
+      chart_name <- paste0(var_name,"_",dat_section)
       
       
       # Produce chart
@@ -196,14 +197,25 @@
                            text = paste(
                              geography_name, "\n",
                              date, "\n",
-                             pop_name," share: ", perc_form(get(share_var),d=1), "%", "\n",
+                             share_pop," share: ", perc_form(get(share_var),d=1), "%", "\n",
                              sep = ""))) +
         ggla_line(aes(colour = geography_name,size = geography_name)) +
         scale_size_manual(values = scale_size,
                           breaks = c("London","UK")) +
         scale_colour_manual(values = pal_named,
                             breaks = c("London","UK")) +
-        ggla_labelline(x1 = ymd("2020-03-01")) + # mark lockdowns start
+        geom_vline(aes(xintercept = as.numeric(ymd("2020-03-01"))),
+                   linetype = "dotted",
+                   size = 1 * mm_to_pt,
+                   colour = rgb(166,166,166,maxColorValue = 255)) + # mark lockdowns start
+        geom_vline(aes(xintercept = as.numeric(ymd("2021-01-01"))),
+                   linetype = "dotted",
+                   size = 1 * mm_to_pt,
+                   colour = rgb(166,166,166,maxColorValue = 255)) + # mark end of free movement
+        geom_vline(aes(xintercept = as.numeric(ymd("2016-06-01"))),
+                   linetype = "dotted",
+                   size = 1 * mm_to_pt,
+                   colour = rgb(166,166,166,maxColorValue = 255)) + # Brexit vote
         ggla_axisat0() +
         geom_hline(aes(yintercept=0), colour="gray45") +
         coord_cartesian(clip = 'off') +
@@ -212,19 +224,18 @@
                                                                     suffix = "%")) +
         scale_x_date() +
         theme(plot.margin = unit(c(1,1,1,1), "cm"))+
-        labs(title = paste0("Share of ",pop_name ," nationals across regions"),
-             subtitle = paste0("Employments in industry: ", dat_section),
-             caption = "PAYE RTI data") +
+        labs(title = paste0("Share of ",share_pop ," nationals across regions"),
+             subtitle = paste0(dat_section, " employments"))+
         theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
       
-      ggsave(here::here(IMAGES,"by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+      ggsave(here::here(IMAGES,"by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 7, height = 5, units = "in")
       
       # Save useful charts in the list
       if (dat_section %in% c("Hospitality","Overall")) {
         
         plotly <- ggplotly(regions_trend,tooltip = "text") %>% 
           ggla_plotly_settings()    %>% 
-          layout(title = list(text = paste0("<b>","Share of ",pop_name ," nationals across regions","</b>",
+          layout(title = list(text = paste0("<b>","Share of ",share_pop ," nationals across regions","</b>",
                                             "<br>",
                                             "<sup>",
                                             paste0("Employments in industry: ", dat_section),
@@ -248,7 +259,7 @@
     }
     
   #.............................................................................
-  # Horizontal bars with share of nationalities in each region
+  ### Horizontal bars with share of nationalities in each region ----
   #.............................................................................
 
     # Sort the regions with UK and London first, then in order of least UK
@@ -299,12 +310,10 @@
                                        unit = "pt")),
             axis.ticks.length.y = ggplot2::unit(x = 0, units = "pt")) + 
       labs(title = paste0("Share of nationals in employments by region"),
-           subtitle = paste0(dat_section," payrolled employments, ",last_date),
-           caption = "PAYE RTI data") +
+           subtitle = paste0(dat_section," payrolled employments, ",last_date))+
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
-    ggsave(here::here(IMAGES,"by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
-    
+    ggsave(here::here(IMAGES,"by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 7, height = 5, units = "in")
     if (dat_section %in% c("Hospitality","Overall","Construction")) {
       plotly <- ggplotly(regioncomp_shares,tooltip = "text") %>% 
         ggla_plotly_settings()    %>% 
@@ -329,6 +338,55 @@
       chart_n <- chart_n + 1 
     }
     
+  #.............................................................................
+  ## Line chart within London region and sector ----
+  #.............................................................................
+    
+    
+      chart_name <- paste0("emp_counts_trend_",dat_section,"_london")
+      
+      pal <- c(  #Four categories: UK, EU, non-EU, but let the latter be shades of a colour
+        gla_pal(gla_theme = "default", palette_type = "quantitative", main_colours = "ldndkpink", n = 2))
+      
+      pal_named <- c("UK"="#cccccc","EU"=pal[1],"Non-EU"=pal[2])
+      
+      
+      # Produce chart
+      industry_trend <- paye_master_long_detail %>% 
+        filter(section_name == dat_section & geography_name=="London" & nationality_name %in% nats_used & measure_name=="counts") %>% 
+        ggplot(mapping = aes(x = date_day, y = measure_value, 
+                             group = nationality_name, 
+                             text = paste(
+                               nationality_name, "\n",
+                               date, "\n",
+                               "Share: ", perc_form(measure_value,d=1), "%", "\n",
+                               sep = ""))) +
+        ggla_line(aes(colour = nationality_name),
+                  linewidth = 2*mm_to_pt) +
+        scale_colour_manual(values = pal_named) +
+        geom_vline(aes(xintercept = as.numeric(ymd("2020-03-01"))),
+                   linetype = "dotted",
+                   size = 1 * mm_to_pt,
+                   colour = rgb(166,166,166,maxColorValue = 255)) + # mark lockdowns start
+        geom_vline(aes(xintercept = as.numeric(ymd("2021-01-01"))),
+                   linetype = "dotted",
+                   size = 1 * mm_to_pt,
+                   colour = rgb(166,166,166,maxColorValue = 255)) + # mark end of free movement
+        geom_vline(aes(xintercept = as.numeric(ymd("2016-06-01"))),
+                   linetype = "dotted",
+                   size = 1 * mm_to_pt,
+                   colour = rgb(166,166,166,maxColorValue = 255)) + # Brexit vote
+        ggla_axisat0() +
+        geom_hline(aes(yintercept=0), colour="gray45") +
+        coord_cartesian(clip = 'off') +
+        scale_y_continuous(expand = c(0, 0), labels = comma_format()) +
+        scale_x_date() +
+        theme(plot.margin = unit(c(1,1,1,1), "cm"))+
+        labs(title = paste0("Employments in London by nationality"),
+             subtitle = paste0(dat_section, " employments"))+
+        theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
+      
+      ggsave(here::here(IMAGES,"by_section",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 7, height = 5, units = "in")
     
   }
   
@@ -340,7 +398,7 @@
   #.............................................................................
 
   #.............................................................................
-  # Horizontal bars with share of nationalities in each section
+  ### Horizontal bars with share of nationalities in each section ----
   #.............................................................................
   
   main_regions <- c("London","UK","England")
@@ -399,15 +457,15 @@
             axis.ticks.length.y = ggplot2::unit(x = 0, units = "pt")) + 
       labs(title = paste0("Share of nationals within ", dat_region),
            subtitle = paste0("Payrolled employments in top ", n_top-1, " industries, ",last_date),
-           caption = "PAYE RTI data") +
+           caption = "") +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
-    ggsave(here::here(IMAGES,"within_region",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"within_region",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 12, height = 5, units = "in")
     
     if (dat_region=="London") {
       plotly <- ggplotly(region_topsec,tooltip = "text") %>% 
         ggla_plotly_settings()    %>% 
-        layout(title = list(text = paste0("<b>","Share of ",pop_name ," nationals within ", dat_region,"</b>",
+        layout(title = list(text = paste0("<b>","Share of nationals within ", dat_region,"</b>",
                                           "<br>",
                                           "<sup>",
                                           paste0("Payrolled employments in top ", n_top-1, " industries"),
@@ -428,7 +486,7 @@
     }
     
     #.............................................................................
-    # Facetted charts with all three nationalities
+    ### Facetted charts with all three nationalities ----
     #.............................................................................
     
     # Reduce number of top sectors
@@ -486,7 +544,7 @@
       scale_y_continuous(limits = c(62, 149),labels = dollar_format(prefix = "", 
                                                                   largest_with_cents = 1,
                                                                   suffix = "")) +
-      scale_x_date(date_labels = "%b'%y",date_breaks = "9 months" ) +
+      scale_x_date(date_labels = "%b'%y",date_breaks = "12 months" ) +
       theme(plot.margin = unit(c(1,1,1,1), "cm"),
             panel.spacing = unit(1,"lines")) %>% 
       labs(title = paste0("Employment by nationality within ", dat_region),
@@ -494,7 +552,7 @@
            caption = "PAYE RTI data") +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
-    ggsave(here::here(IMAGES,"within_region",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"within_region",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 10, height = 5, units = "in")
     
     if (dat_region %in% c("London","UK")) {
       
@@ -574,17 +632,19 @@
       names(london_charts)[chart_n] <- chart_name
       
       chart_n <- chart_n + 1 
-      }
+    }
   }
   
   #.............................................................................
-  ## 02.3. Sector deep dives ----
+  ## 02.3. Growth across sectors ----
   #.............................................................................
   
   
   # Plot percentage change by sector within regions
   for (dat_region in main_regions) {
     
+    
+    ### Growth in percentage ----
     
     # Only plot the top N sections (+ Overall) in each region, defined by number of total employees in last date
     n_top <- 10 + 1
@@ -648,7 +708,7 @@
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     section_change_bar
     
-    ggsave(here::here(IMAGES,"across_sections",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"across_sections",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 14, height = 6, units = "in")
     
     if (dat_region=="London") {
       plotly <- ggplotly(section_change_bar,tooltip = "text") %>% 
@@ -673,6 +733,72 @@
       chart_n <- chart_n + 1 
     }
     
+    
+    
+    ### Growth in levels ----
+    # Only include EU and non-EU, and exclude overall as dwarfs sectors
+    
+    # Only plot the top N sections (+ Overall) in each region, defined by number of total employees in last date
+    n_top <- 10+1
+    top_sections <- paye_master_long_detail %>% 
+      filter(geography_name == dat_region & date_day==max(date_day) & measure_name=="counts" & nationality=="overall") %>% 
+      arrange(desc(measure_value)) %>% 
+      slice_head(n=n_top) %>% # Overall is guaranteed to be top no matter what
+      arrange(desc(d_change_dec19)) %>% # Sort sectors with largest perc. change first
+      pull(section_name)
+    
+    #top_sections_sort <- c("Overall",setdiff(top_sections,c("Overall"))) # Ensure overall is first
+    
+    chart_name <- paste0("d_change_",dat_region)
+    
+    # For the palette
+    nat_names_sort <- c("Non-EU","EU")
+    pal <- c(  
+      gla_pal(gla_theme = "default", palette_type = "quantitative", main_colours = "ldndkpink", n = 2))
+    
+    pal_named <- c("EU"=pal[1],"Non-EU"=pal[2])
+    
+    
+    section_change_bar <- paye_master_long_detail %>%
+      filter( geography_name == dat_region & date_day == max(date_day) & measure_name == "counts" 
+              & nationality_name %in% nat_names_sort & section_name %in% top_sections & section_name!="Overall")  %>% 
+      ggplot(mapping = aes(x =  factor(section_name,levels=rev(top_sections_sort)), 
+                           y = d_change_dec19, 
+                           colour = factor(nationality_name,levels=rev(nat_names_sort)), #since horizontal bar reverses orders, we need to reverse too
+                           fill = factor(nationality_name,levels=rev(nat_names_sort)),
+                           text = paste(section_name, "\n",
+                                        "Nationality: ",nationality_name, "\n",
+                                        "Change: ", perc_form(d_change_dec19),"%", "\n",
+                                        sep = "")))   +
+      geom_bar(stat = "identity", position = position_dodge(), width=0.5)+ # bars
+      coord_flip()  + # flip to horizontal
+      # geom_vline(xintercept=c(n_top - 0.5),colour="gray45", 
+      #            linetype = "dotted")+ #adds line below total
+      geom_hline(aes(yintercept=0), colour="gray45") +
+      scale_color_manual(values = rev(pal_named), aesthetics = "colour")+ #fills bars
+      scale_fill_manual(values = rev(pal_named), aesthetics = "fill")+ #outlines bars
+      theme_set(theme_gla(gla_theme = "default", y_label_length=100)) + #GLA theme and removes lines below y-axis labels
+      scale_y_continuous(labels = comma_format()) +
+      theme(plot.margin = unit(c(1,1,1,1), "cm"))+
+      scale_x_discrete() +
+      theme(panel.grid.major.y = element_blank(),
+            panel.grid.minor.y = element_blank(),
+            panel.grid.major.x = element_line( size=.5 ),
+            axis.text.y = ggplot2::element_text(
+              hjust = 0, vjust = 0.5,
+              margin = ggplot2::margin(t = 0, r = 0, b = 0, l = 0,
+                                       unit = "pt")),
+            axis.ticks.length.y = ggplot2::unit(x = 0, units = "pt")) + 
+      guides(colour=guide_legend(reverse=TRUE),
+             fill=guide_legend(reverse=TRUE)) +
+      labs(title = paste0("Payrolled employments change by industry in ",dat_region),
+           subtitle = paste0("Change by nationality Dec 2019-",last_date_month))+
+      theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
+    section_change_bar
+    
+    ggsave(here::here(IMAGES,"across_sections",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 14, height = 6, units = "in")
+    
+    
   }
   
   #.............................................................................
@@ -680,7 +806,7 @@
   #.............................................................................
   
   #.............................................................................
-  # Create trend chart for London nationalities overall
+  #### Create trend chart for London nationalities overall ----
   #.............................................................................
   
   # Define function
@@ -747,7 +873,7 @@
                             "\n\nNote: Estimates are based on where employees live. Vertical lines indicate Brexit vote of June 2016, \nbeginning of lockdowns in March 2020, and end of free movement in January 2021, respectively.")) +
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
-    ggsave(here::here(IMAGES,"ad_hoc",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 8, height = 8, units = "in")
+    ggsave(here::here(IMAGES,"ad_hoc",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 10, height =6, units = "in")
     
     # Plotly
     plotly <- ggplotly(trend_chart,tooltip = "text") %>% 
