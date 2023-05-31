@@ -874,6 +874,7 @@
       theme(plot.caption = element_text(color = rgb(166,166,166,maxColorValue = 255)))
     
     ggsave(here::here(IMAGES,"ad_hoc",gsub(" ","_",paste0(chart_name,".png"))), device = "png", width = 10, height =6, units = "in")
+    ggsave(here::here(IMAGES,"ad_hoc",gsub(" ","_",paste0(chart_name,"_sq",".png"))), device = "png", width = 7, height =7, units = "in")
     
     # Plotly
     plotly <- ggplotly(trend_chart,tooltip = "text") %>% 
